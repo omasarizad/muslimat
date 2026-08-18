@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أعلام — تدقيق UX + محاكاة تفاعلية + دليل المطور</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;
+  --s500:#64748b;--s600:#475569;--s700:#334155;--s800:#1e293b;--s900:#0f172a;
+  --g50:#f0fdf4;--g100:#dcfce7;--g200:#bbf7d0;--g500:#22c55e;
+  --g600:#16a34a;--g700:#15803d;--g800:#166534;--g900:#14532d;
+  --g-ring:rgba(22,163,74,0.12);
+  --r:8px;--rl:12px;
+}
+body{font-family:"IBM Plex Sans Arabic",sans-serif;background:#f0f2f5;color:var(--s800);font-size:14px;line-height:1.8}
+
+/* === NAV === */
+.tn{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--s900);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;box-shadow:0 2px 12px rgba(0,0,0,.3);flex-wrap:wrap}
+.nl{color:var(--s400);font-size:11px;font-weight:500}
+.bg{display:flex;border-radius:6px;overflow:hidden;border:1px solid var(--s700)}
+.bg button{padding:6px 12px;border:none;background:transparent;color:var(--s400);cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;transition:.15s;white-space:nowrap}
+.bg button.a{background:var(--g600);color:#fff}
+.bg button:hover:not(.a){background:var(--s700);color:#fff}
+
+/* === TABS === */
+.tab-content{margin-top:52px;display:none;min-height:calc(100vh - 52px)}
+.tab-content.vis{display:block}
+
+/* === COMPARISON === */
+.comp-sec{max-width:1200px;margin:0 auto;padding:32px 24px}
+.comp-sec>h2{font-size:22px;font-weight:700;margin-bottom:8px;color:var(--s800)}
+.comp-sec>.desc{font-size:14px;color:var(--s500);margin-bottom:24px;line-height:1.7}
+.comp-card{background:#fff;border-radius:var(--rl);box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:32px;overflow:hidden}
+.comp-header{padding:16px 24px;border-bottom:1px solid var(--s200);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.comp-header h3{font-size:16px;font-weight:700;color:var(--s800)}
+.comp-pages{display:flex;gap:4px;flex-wrap:wrap}
+.comp-pages .cp{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;background:var(--s100);color:var(--s600)}
+.comp-pane{padding:20px;position:relative;border-bottom:1px solid var(--s200)}
+.comp-pane:last-of-type{border-bottom:none}
+.comp-label{display:inline-block;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;margin-bottom:12px}
+.comp-label.before{background:#fef2f2;color:#dc2626}
+.comp-label.after{background:var(--g50);color:var(--g700)}
+.screenshot-scroll{max-height:500px;overflow-y:auto;border:1px solid var(--s200);border-radius:var(--r)}
+.screenshot-scroll img{width:100%;display:block}
+/* Code pane — hidden, shown via view-bar code tab */
+.comp-code{display:none;padding:20px;background:var(--s900)}
+.comp-code.vis{display:block}
+.comp-code h4{color:var(--g500);font-size:12px;font-weight:600;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.5px}
+.comp-code pre{background:var(--s900);color:#e2e8f0;font-family:"IBM Plex Mono",monospace;font-size:12px;line-height:1.6;white-space:pre;direction:ltr;text-align:left;margin:0 0 16px;overflow-x:auto;tab-size:2}
+.comp-code pre:last-child{margin-bottom:0}
+td.mp-dim,th.mp-dim{border-style:none !important;margin:0;padding:8px 6px !important}
+.ann-section{padding:16px 24px;border-top:1px solid var(--s200);background:var(--s50)}
+.ann-section-title{font-size:13px;font-weight:600;color:var(--s500);margin-bottom:12px}
+.ann{padding:10px 14px;border-radius:var(--r);margin-bottom:6px;font-size:13px;line-height:1.7}
+.ann.hide{background:#fef2f2;border:1px solid #fecaca}
+.ann.hide::before{content:"اقتراح: إخفاء";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#dc2626;color:#fff;margin-left:8px}
+.ann.collapse{background:#fff7ed;border:1px solid #fed7aa}
+.ann.collapse::before{content:"اقتراح: طي";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#ea580c;color:#fff;margin-left:8px}
+.ann.rename{background:#eff6ff;border:1px solid #bfdbfe}
+.ann.rename::before{content:"اقتراح: تسمية";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#2563eb;color:#fff;margin-left:8px}
+.ann.style{background:var(--g50);border:1px solid var(--g200)}
+.ann.style::before{content:"اقتراح: تنسيق";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--g600);color:#fff;margin-left:8px}
+.ann.redirect{background:#fefce8;border:1px solid #fef08a}
+.ann.redirect::before{content:"اقتراح: توجيه";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#ca8a04;color:#fff;margin-left:8px}
+.ann.add{background:#f0f9ff;border:1px solid #bae6fd}
+.ann.add::before{content:"اقتراح: إضافة";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#0284c7;color:#fff;margin-left:8px}
+.ann.note{background:#faf5ff;border:1px solid #e9d5ff}
+.ann.note::before{content:"ملاحظة";display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#7c3aed;color:#fff;margin-left:8px}
+.ann code{background:var(--s100);padding:1px 6px;border-radius:4px;font-family:"IBM Plex Mono",monospace;font-size:12px;direction:ltr;display:inline-block}
+.ann .why{display:block;color:var(--s600);font-size:12px;margin-top:4px;line-height:1.8}
+.ann .alt{display:block;color:#7c3aed;font-size:12px;margin-top:4px;line-height:1.8;font-weight:500}
+
+/* Mock-page element state indicators */
+.mp-dim{opacity:0.3;position:relative;border:1.5px dashed #fca5a5;border-radius:4px;padding:4px 6px;margin:6px 0}
+.mp-dim::before{content:"اقتراح: إخفاء";position:absolute;top:-8px;left:4px;font-size:8px;background:#dc2626;color:#fff;padding:0 5px;border-radius:3px;white-space:nowrap;z-index:1;line-height:16px}
+.mp-col{opacity:0.5;position:relative;border:1.5px dashed #fdba74;border-radius:4px;padding:4px 6px;margin:6px 0}
+.mp-col::before{content:"اقتراح: طي";position:absolute;top:-8px;left:4px;font-size:8px;background:#ea580c;color:#fff;padding:0 5px;border-radius:3px;white-space:nowrap;z-index:1;line-height:16px}
+.mp-less{opacity:0.45;position:relative;border:1.5px dashed #d8b4fe;border-radius:4px;padding:4px 6px;margin:6px 0}
+.mp-less::before{content:"تقليل بروز";position:absolute;top:-8px;left:4px;font-size:8px;background:#7c3aed;color:#fff;padding:0 5px;border-radius:3px;white-space:nowrap;z-index:1;line-height:16px}
+.mp-sty{position:relative;border:1.5px solid var(--g200);border-radius:4px;padding:4px 6px;margin:6px 0}
+.mp-sty::before{content:"اقتراح: تنسيق";position:absolute;top:-8px;left:4px;font-size:8px;background:var(--g600);color:#fff;padding:0 5px;border-radius:3px;white-space:nowrap;z-index:1;line-height:16px}
+
+/* Clean mode — hides annotations, removes hidden elements */
+.clean-mode .mp-dim{display:none !important}
+.clean-mode .mp-col::before,.clean-mode .mp-less::before,.clean-mode .mp-sty::before,.clean-mode .mp-dim::before{display:none !important}
+.clean-mode .mp-col{opacity:1;border:none;padding:0;margin:0}
+.clean-mode .mp-less{opacity:0.55;border:none;padding:0;margin:0}
+.clean-mode .mp-sty{border:none;padding:0;margin:0}
+.clean-mode .mp-rename{border:none;padding:0;margin:0}
+.clean-mode .mp-rename::before{display:none !important}
+.clean-mode .mp-new{border:none;padding:0;margin:0}
+.clean-mode .mp-new::before{display:none !important}
+
+/* View toggle bar */
+.view-bar{display:flex;gap:4px;margin-bottom:12px;align-items:center}
+.view-bar .vb{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--s200);background:#fff;color:var(--s500);transition:.15s}
+.view-bar .vb.active{background:var(--g600);color:#fff;border-color:var(--g600)}
+.view-bar .vb:hover:not(.active){background:var(--s100)}
+.view-bar .vb-full{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--s200);background:#fff;color:var(--g700);margin-right:auto;transition:.15s}
+.view-bar .vb-full:hover{background:var(--g50);border-color:var(--g600)}
+
+/* Fullscreen modal */
+.fs-modal{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.fs-modal.open{display:flex}
+.fs-modal-inner{background:#f0f2f5;border-radius:12px;width:100%;max-width:1200px;margin:20px auto;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.fs-close{position:fixed;top:16px;left:16px;z-index:100000;width:40px;height:40px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.fs-modal.open+.fs-close{display:flex}
+
+/* === ELEMENT INVENTORY === */
+.inv-wrap{max-width:1200px;margin:0 auto;padding:32px 24px}
+.inv-table{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:32px}
+.inv-table thead th{text-align:right;padding:14px 12px;font-size:12px;font-weight:600;color:var(--s500);background:var(--s50);border-bottom:2px solid var(--s200);white-space:nowrap}
+.inv-table td{padding:12px;border-bottom:1px solid var(--s100);font-size:13px;vertical-align:top}
+.inv-table tr:hover{background:var(--s50)}
+.el-name{font-weight:600;color:var(--s800)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:1px 2px}
+.tag-hide{background:#fef2f2;color:#dc2626}
+.tag-style{background:var(--g50);color:var(--g700)}
+.tag-rename{background:#eff6ff;color:#2563eb}
+.tag-redirect{background:#fefce8;color:#ca8a04}
+.tag-collapse{background:#fff7ed;color:#ea580c}
+.tag-add{background:#f0f9ff;color:#0284c7}
+.tag-less{background:#faf5ff;color:#7c3aed}
+.pages-list{display:flex;gap:4px;flex-wrap:wrap}
+.pages-list span{padding:2px 8px;background:var(--s100);border-radius:4px;font-size:11px;color:var(--s600)}
+.impl{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--s500);direction:ltr;text-align:left}
+/* Visual element preview */
+.el-vis{border:1px solid var(--s200);border-radius:6px;padding:6px 8px;background:var(--s50);font-size:11px;max-width:200px;line-height:1.5}
+
+/* === DOC PANEL (audit + code) === */
+.doc-inner{max-width:900px;margin:0 auto;padding:32px 24px}
+.doc-inner h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.doc-inner h2{font-size:20px;font-weight:700;margin:32px 0 12px;color:var(--g700);padding-bottom:8px;border-bottom:2px solid var(--g100)}
+.doc-inner h3{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--s800)}
+.doc-inner h4{font-size:14px;font-weight:700;margin:16px 0 6px;color:var(--s700)}
+.doc-inner p,.doc-inner li{font-size:14px;line-height:1.9;color:var(--s700);margin-bottom:8px}
+.doc-inner ul,.doc-inner ol{padding-right:20px;margin-bottom:12px}
+.doc-inner strong{color:var(--s800)}
+.doc-inner blockquote{background:var(--g50);border:1px solid var(--g200);border-radius:var(--rl);padding:16px 20px;margin:16px 0}
+.doc-inner blockquote p:last-child{margin-bottom:0}
+.doc-table{width:100%;border-collapse:collapse;margin:16px 0}
+.doc-table th{text-align:right;padding:10px 12px;background:var(--s50);border-bottom:2px solid var(--s200);font-size:12px;font-weight:600;color:var(--s500)}
+.doc-table td{padding:10px 12px;border-bottom:1px solid var(--s100);font-size:13px}
+.code-block{background:var(--s900);color:#e2e8f0;padding:20px 24px;border-radius:var(--rl);font-family:"IBM Plex Mono",monospace;font-size:12px;line-height:1.6;overflow-x:auto;direction:ltr;text-align:left;margin:16px 0;white-space:pre;tab-size:2;max-height:70vh;overflow-y:auto}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge.cr{background:#fef2f2;color:#dc2626}
+.badge.md{background:#fffbeb;color:#d97706}
+.badge.mn{background:var(--g50);color:var(--g700)}
+.callout{background:var(--g50);border:1px solid var(--g200);border-radius:var(--rl);padding:20px;margin:24px 0}
+.callout h3{margin-top:0;color:var(--g800)}
+.callout p:last-child{margin-bottom:0}
+.finding{background:#fff;border:1px solid var(--s200);border-radius:var(--r);padding:16px;margin:12px 0}
+.finding-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.finding-head .pri{font-size:16px}
+.finding-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;margin:8px 0}
+.finding-meta dt{font-weight:600;color:var(--s500)}
+.finding-meta dd{color:var(--s700)}
+
+/* === DASHBOARD CARD GRID (mockup) === */
+.dash-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:16px}
+.dash-card{background:#fff;border:1px solid var(--s200);border-radius:var(--r);padding:20px 12px;text-align:center;cursor:pointer;transition:.15s}
+.dash-card:hover{border-color:var(--g500);box-shadow:0 2px 8px rgba(22,163,74,.1)}
+.dash-icon{width:48px;height:48px;border-radius:50%;background:var(--g50);color:var(--g600);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:22px}
+.dash-card span{font-size:13px;font-weight:600;color:var(--s700)}
+
+/* === STATS SUMMARY === */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;text-align:center;margin:24px 0}
+.stat-box{background:#fff;padding:16px;border-radius:var(--r);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat-box .num{font-size:28px;font-weight:700}
+.stat-box .lbl{font-size:12px;color:var(--s500)}
+
+@media(max-width:800px){
+  .dash-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="tn">
+  <span class="nl">عرض:</span>
+  <div class="bg">
+    <button class="a" onclick="showTab('compare',this)">المقارنة (قبل/بعد)</button>
+    <button onclick="showTab('inventory',this)">جدول العناصر</button>
+    <button onclick="showTab('audit',this)">تقرير UX</button>
+    <button onclick="showTab('css',this)">ملف CSS</button>
+    <button onclick="showTab('php',this)">كود PHP</button>
+  </div>
+</div>
+
+<!-- ==================== TAB 1: COMPARISONS ==================== -->
+<div class="tab-content vis" id="tab-compare">
+<div class="comp-sec">
+  <h2>مقارنة قبل وبعد التحسين — لوحة تحكم أعلام</h2>
+  <p class="desc">كل قسم يعرض لقطة شاشة حقيقية من الوضع الحالي ثم الشكل المستهدف بعد التحسين مع التغييرات المطلوبة وسبب كل تغيير. أيقونات الشريط الجانبي تبقى كما هي — التغييرات تشمل الألوان والتسميات والعناصر المخفية فقط.</p>
+
+  <!-- ========== 1. DASHBOARD ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>١. الصفحة الرئيسية (Dashboard)</h3>
+      <div class="comp-pages"><span class="cp">أول صفحة بعد الدخول</span></div>
+    </div>
+    <div class="comp-code" id="code-dash">
+      <h4>CSS — الشريط الجانبي + بطاقات الرئيسية</h4>
+<pre>/* Sidebar — softer background */
+#adminmenuback, #adminmenuwrap, #adminmenu {
+  background: #1e293b !important;
+}
+#adminmenu .wp-has-current-submenu &gt; a,
+#adminmenu li.current a.menu-top {
+  background: #16a34a !important;
+  color: #fff !important;
+}
+#adminmenu .wp-submenu { background: #0f172a !important; }
+#adminmenu li.menu-top:hover { background: #334155 !important; }
+
+/* Dashboard card grid */
+.aalaam-dash-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px; padding: 16px 0;
+}
+.aalaam-dash-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 8px; padding: 20px 12px;
+  text-align: center; color: #334155; transition: 0.15s;
+}
+.aalaam-dash-card:hover {
+  border-color: #16a34a;
+  box-shadow: 0 2px 8px rgba(22,163,74,0.1);
+}
+
+/* Hide Tools menu + Taxonomy Order submenus */
+#adminmenu #menu-tools { display: none !important; }
+#adminmenu a[href*="page=to-interface-"] { display: none !important; }
+
+/* Rename WPML visually */
+#adminmenu a[href*="page=tm/menu/main.php"] .wp-menu-name {
+  font-size: 0 !important;
+}
+#adminmenu a[href*="page=tm/menu/main.php"] .wp-menu-name::after {
+  content: "الترجمة" !important;
+  font-size: 14px !important;
+}</pre>
+    </div>
+    <div class="comp-pane">
+      <span class="comp-label before">الوضع الحالي (لقطة حقيقية)</span>
+      <div class="screenshot-scroll"><img src="screenshots/01-dashboard.png" alt="Dashboard — current"></div>
+    </div>
+    <div class="comp-pane" id="pane-dash">
+      <span class="comp-label after">بعد التحسين</span>
+      <div class="view-bar">
+        <span class="vb" data-mode="code" onclick="setView('pane-dash','code')">{ } الكود</span>
+        <span class="vb-full" onclick="viewFull('pane-dash')">↗ عرض كامل</span>
+      </div>
+      <div class="after-content" style="background:#f0f2f5;border-radius:var(--r);overflow:hidden;border:1px solid var(--s200)">
+        <div style="background:#1e293b;color:#94a3b8;font-size:12px;padding:6px 16px;display:flex;justify-content:flex-end;gap:12px"><span style="color:#fff">مرحباً، المستخدم</span><span>الرئيسية</span></div>
+        <div style="display:flex">
+          <div style="width:200px;background:#1e293b;padding:12px 0;min-height:400px;flex-shrink:0">
+            <div style="text-align:center;color:#fff;font-size:16px;font-weight:700;padding:4px 0 16px">أعلام</div>
+            <div style="background:#16a34a;color:#fff;padding:8px 16px;font-size:13px;border-radius:0 6px 6px 0;margin-left:8px">الرئيسية</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">الدروس</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">السلاسل العلمية</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">المقالات</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">أسئلة وأجوبة</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">بودكاست</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">فوائد</div>
+          </div>
+          <!-- Main content: card grid -->
+          <div style="flex:1;padding:24px">
+            <div style="font-size:22px;font-weight:700;margin-bottom:20px;color:var(--s800)">الرئيسية</div>
+            <div class="dash-grid">
+              <div class="dash-card"><div class="dash-icon">📖</div><span>الدروس</span></div>
+              <div class="dash-card"><div class="dash-icon">🎬</div><span>السلاسل العلمية</span></div>
+              <div class="dash-card"><div class="dash-icon">📌</div><span>المقالات</span></div>
+              <div class="dash-card"><div class="dash-icon">❓</div><span>أسئلة وأجوبة</span></div>
+              <div class="dash-card"><div class="dash-icon">📄</div><span>الصفحات الثابتة</span></div>
+              <div class="dash-card"><div class="dash-icon">🎙️</div><span>بودكاست</span></div>
+              <div class="dash-card"><div class="dash-icon">💬</div><span>فوائد</span></div>
+              <div class="dash-card"><div class="dash-icon">🎓</div><span>الدروس العلمية</span></div>
+              <div class="dash-card"><div class="dash-icon">🖼️</div><span>الوسائط</span></div>
+              <div class="dash-card"><div class="dash-icon">👤</div><span>الأعضاء</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ann-section">
+      <div class="ann-section-title">التغييرات المقترحة للمطور</div>
+      <div class="ann add"><strong>بطاقات روابط سريعة للصفحة الرئيسية</strong> — شبكة بطاقات (٥ في الصف) تربط بكل نوع محتوى متاح. <code>PHP: add_action('welcome_panel',...)</code> <span class="why">الصفحة الرئيسية حالياً فارغة تماماً. المستخدم يدخل ولا يعرف من أين يبدأ. البطاقات تعطيه نظرة عامة فورية على كل ما يمكنه فعله — مثل صفحة رئيسية لتطبيق هاتف. هذا يُطبّق مبدأ Progressive Disclosure: ابدأ بالمفيد.</span></div>
+      <div class="ann redirect"><strong>توجيه تسجيل الدخول</strong> — بدلاً من الرئيسية الفارغة، وجّه المستخدم إلى صفحة الدروس مباشرة (كحل مؤقت حتى تُنفّذ بطاقات الرئيسية). <code>add_filter('login_redirect',...)</code> <span class="why">أول ما يراه المستخدم بعد الدخول هو صفحة بيضاء — أسوأ انطباع أول ممكن. التوجيه لقائمة المحتوى يُعطيه سياقاً فورياً.</span></div>
+      <div class="ann style"><strong>ألوان الشريط الجانبي</strong> — تغيير من الافتراضي إلى رمادي-أزرق داكن (#1e293b) مع لون أخضر (#16a34a) للعنصر النشط. <code>CSS: #adminmenuback { background:#1e293b }</code> <span class="why">التوجه البصري الجديد يستخدم ألوان هادئة ومريحة. أيقونات القائمة تبقى كما هي — التغيير في الألوان فقط. يمكن تعديل اللون ليتماشى مع هوية الموقع.</span></div>
+      <div class="ann hide"><strong>Taxonomy Order</strong> — إخفاء من كل القوائم الفرعية. <code>#adminmenu a[href*="page=to-interface-"] { display:none }</code> <span class="why">صفحة إنجليزية بالكامل مع إعلانات ترويجية ("Did you find this plugin useful?"). وجود صفحة بلغة مختلفة مع إعلانات يكسر ثقة المستخدم بالمنصة.</span></div>
+      <div class="ann hide"><strong>أدوات</strong> — إخفاء من القائمة. <code>remove_menu_page('tools.php')</code> <span class="why">الصفحة فارغة تماماً لهذا الدور. عنصر قائمة يؤدي لصفحة فارغة يُعطي انطباعاً بأن المنصة ناقصة.</span></div>
+      <div class="ann hide"><strong>WPML → ترجمة النصوص، إعدادات</strong> — إخفاء الصفحات الفرعية المحجوبة. <code>remove_submenu_page()</code> <span class="why">هذه الصفحات تُظهر "ليس لديك إذن" عند النقر عليها. لا تعرض ما لا يمكن استخدامه — كل نقرة فاشلة تُحبط المستخدم.</span></div>
+      <div class="ann rename"><strong>WPML → "الترجمة"</strong> <code>PHP: $menu[0] = 'الترجمة'</code> <span class="why">المستخدم يبحث عن وظيفة ("أريد ترجمة محتوى") لا عن اسم منتج تقني. سمّ الأشياء بما تفعله.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 2. CONTENT LIST ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>٢. جداول المحتوى (قائمة الدروس كمثال)</h3>
+      <div class="comp-pages"><span class="cp">الدروس</span><span class="cp">السلاسل</span><span class="cp">المقالات</span><span class="cp">أسئلة وأجوبة</span><span class="cp">بودكاست</span><span class="cp">فوائد</span><span class="cp">الدروس العلمية</span></div>
+    </div>
+    <div class="comp-code" id="code-list">
+      <h4>CSS — تنسيق الجداول</h4>
+<pre>/* Hide extra columns */
+.column-content, th.column-content { display: none !important; }
+.column-rank_math_seo_details, th.column-rank_math_seo_details { display: none !important; }
+.column-slug, th.column-slug { display: none !important; }
+td.column-icl_translations, th.column-icl_translations { display: none !important; }
+
+/* Bigger thumbnails */
+.wp-list-table .column-thumbnail img,
+.wp-list-table td img.wp-post-image {
+  width: 60px !important; height: 60px !important;
+  object-fit: cover !important; border-radius: 6px !important;
+}
+
+/* Better row spacing + hover */
+.wp-list-table td, .wp-list-table th { padding: 12px 10px !important; }
+.wp-list-table tbody tr:hover { background: #f1f5f9 !important; }
+.wp-list-table thead th {
+  background: #f8fafc !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  color: #475569 !important; font-weight: 600 !important;
+}
+
+/* Hide top bulk actions */
+.tablenav.top .bulkactions { display: none !important; }</pre>
+    </div>
+    <div class="comp-pane">
+      <span class="comp-label before">الوضع الحالي (لقطة حقيقية)</span>
+      <div class="screenshot-scroll"><img src="screenshots/04-الدروس.png" alt="Content list — current"></div>
+    </div>
+    <div class="comp-pane" id="pane-list">
+      <span class="comp-label after">بعد التحسين</span>
+      <div class="view-bar">
+        <span class="vb active" data-mode="annotated" onclick="setView('pane-list','annotated')">⚙ مع التوضيحات</span>
+        <span class="vb" data-mode="clean" onclick="setView('pane-list','clean')">✓ المظهر النهائي</span>
+        <span class="vb" data-mode="code" onclick="setView('pane-list','code')">{ } الكود</span>
+        <span class="vb-full" onclick="viewFull('pane-list')">↗ عرض كامل</span>
+      </div>
+      <div class="after-content" style="background:#f0f2f5;border-radius:var(--r);overflow:hidden;border:1px solid var(--s200)">
+        <div style="background:#1e293b;color:#94a3b8;font-size:12px;padding:6px 16px;display:flex;justify-content:flex-end;gap:12px"><span style="color:#fff">مرحباً، المستخدم</span><span>الرئيسية</span></div>
+        <div style="display:flex">
+          <div style="width:200px;background:#1e293b;padding:12px 0;min-height:380px;flex-shrink:0">
+            <div style="text-align:center;color:#fff;font-size:16px;font-weight:700;padding:4px 0 16px">أعلام</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">الرئيسية</div>
+            <div style="background:#16a34a;color:#fff;padding:8px 16px;font-size:13px;border-radius:0 6px 6px 0;margin-left:8px">الدروس</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">السلاسل العلمية</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">المقالات</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">أسئلة وأجوبة</div>
+          </div>
+          <div style="flex:1;padding:20px;background:#f0f2f5">
+            <div style="background:#fff;border-radius:var(--r);padding:16px;border:1px solid var(--s200)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <span style="font-size:20px;font-weight:700">الدروس</span>
+                <span style="background:var(--g600);color:#fff;padding:8px 16px;border-radius:6px;font-size:13px">+ أضف درس</span>
+              </div>
+              <div style="display:flex;gap:12px;margin-bottom:12px;font-size:13px;color:var(--s500)">
+                <span style="border-bottom:2px solid var(--g600);padding-bottom:4px;color:var(--s800);font-weight:600">الكل (١٢٥)</span>
+                <span>المنشورة (١٢٠)</span><span>مسودة (٥)</span>
+              </div>
+              <!-- Bulk actions top (mp-dim) -->
+              <div class="mp-dim" style="margin-bottom:10px;display:flex;gap:6px;align-items:center"><select style="font-size:11px;padding:3px 6px;border:1px solid var(--s300);border-radius:4px"><option>إجراءات مجمّعة</option></select><button style="font-size:11px;padding:3px 8px;border:1px solid var(--s300);border-radius:4px;background:#fff">تطبيق</button></div>
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <tr style="background:var(--s50);font-weight:600;color:var(--s500)">
+                  <td style="padding:8px;width:24px">☐</td>
+                  <td style="padding:8px">الصورة</td>
+                  <td style="padding:8px">العنوان</td>
+                  <td class="mp-dim" style="font-size:11px">المحتوى</td>
+                  <td style="padding:8px">التصنيف</td>
+                  <td class="mp-dim" style="font-size:11px">SEO</td>
+                  <td class="mp-dim" style="font-size:11px">🇸🇦🇬🇧</td>
+                  <td class="mp-dim" style="font-size:11px">Slug</td>
+                  <td style="padding:8px">الحالة</td>
+                  <td style="padding:8px">التاريخ</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px">☐</td>
+                  <td style="padding:8px"><div style="width:48px;height:48px;background:var(--s200);border-radius:6px"></div></td>
+                  <td style="padding:8px;font-weight:600;color:var(--g700)">حكم صلاة المرأة في المسجد<div style="font-size:10px;color:var(--s400);font-weight:400">تحرير | عرض | حذف</div></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">حكم صلاة المرأة في المسجد وما...</td>
+                  <td style="padding:8px;color:var(--s600)">أحكام الوظائف</td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">N/A</td>
+                  <td class="mp-dim"><span style="font-size:13px">🇸🇦</span><span style="font-size:9px;color:var(--s400)">+</span></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400);direction:ltr">حكم-صلاة</td>
+                  <td style="padding:8px"><span style="background:var(--g100);color:var(--g800);padding:2px 8px;border-radius:100px;font-size:10px">منشور</span></td>
+                  <td style="padding:8px;color:var(--s500);font-size:11px">٢٠٢٦/٠٨/١٢</td>
+                </tr>
+                <tr style="border-top:1px solid var(--s100)">
+                  <td style="padding:8px">☐</td>
+                  <td style="padding:8px"><div style="width:48px;height:48px;background:var(--s200);border-radius:6px"></div></td>
+                  <td style="padding:8px;font-weight:600;color:var(--g700)">فضل قيام الليل<div style="font-size:10px;color:var(--s400);font-weight:400">تحرير | عرض | حذف</div></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">فضل قيام الليل وأحكامه...</td>
+                  <td style="padding:8px;color:var(--s600)">فضائل</td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">N/A</td>
+                  <td class="mp-dim"><span style="font-size:13px">🇸🇦</span><span style="font-size:9px;color:var(--s400)">+</span></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400);direction:ltr">فضل-قيام</td>
+                  <td style="padding:8px"><span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:100px;font-size:10px">مسودة</span></td>
+                  <td style="padding:8px;color:var(--s500);font-size:11px">٢٠٢٦/٠٨/٠٩</td>
+                </tr>
+                <tr style="border-top:1px solid var(--s100)">
+                  <td style="padding:8px">☐</td>
+                  <td style="padding:8px"><div style="width:48px;height:48px;background:var(--s200);border-radius:6px"></div></td>
+                  <td style="padding:8px;font-weight:600;color:var(--g700)">أحكام زينة المرأة<div style="font-size:10px;color:var(--s400);font-weight:400">تحرير | عرض | حذف</div></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">أحكام زينة المرأة في الإسلام...</td>
+                  <td style="padding:8px;color:var(--s600)">الزينة</td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">N/A</td>
+                  <td class="mp-dim"><span style="font-size:13px">🇸🇦</span><span style="font-size:9px;color:var(--s400)">+</span></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400);direction:ltr">أحكام-زينة</td>
+                  <td style="padding:8px"><span style="background:var(--g100);color:var(--g800);padding:2px 8px;border-radius:100px;font-size:10px">منشور</span></td>
+                  <td style="padding:8px;color:var(--s500);font-size:11px">٢٠٢٦/٠٧/٢٨</td>
+                </tr>
+                <tr style="border-top:1px solid var(--s100)">
+                  <td style="padding:8px">☐</td>
+                  <td style="padding:8px"><div style="width:48px;height:48px;background:var(--s200);border-radius:6px"></div></td>
+                  <td style="padding:8px;font-weight:600;color:var(--g700)">حقوق الزوج على الزوجة<div style="font-size:10px;color:var(--s400);font-weight:400">تحرير | عرض | حذف</div></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">حقوق الزوج على الزوجة وما...</td>
+                  <td style="padding:8px;color:var(--s600)">فقه المرأة</td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400)">N/A</td>
+                  <td class="mp-dim"><span style="font-size:13px">🇸🇦</span><span style="font-size:9px;color:var(--s400)">+</span></td>
+                  <td class="mp-dim" style="font-size:10px;color:var(--s400);direction:ltr">حقوق-الزوج</td>
+                  <td style="padding:8px"><span style="background:var(--g100);color:var(--g800);padding:2px 8px;border-radius:100px;font-size:10px">منشور</span></td>
+                  <td style="padding:8px;color:var(--s500);font-size:11px">٢٠٢٦/٠٧/١٥</td>
+                </tr>
+              </table>
+              <div style="font-size:11px;color:var(--s400);padding-top:10px;display:flex;justify-content:space-between"><span>٤ من ١٢٥ عنصر</span><span>« ١ ٢ ٣ ٤ ٥ ... ١٣ »</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ann-section">
+      <div class="ann-section-title">التغييرات المقترحة للمطور</div>
+      <div class="ann hide"><strong>عمود المحتوى/المقتطف</strong> <code>.column-content { display:none }</code> <span class="why">يعرض أول ٢٠ كلمة بشكل مبتور — لا أحد يقرأ المحتوى من الجدول. المستخدم يفتح المنشور للقراءة الكاملة. هذا العمود يأخذ مساحة عرضية كبيرة ويجعل الجدول مكتظاً.</span></div>
+      <div class="ann hide"><strong>أعمدة أعلام اللغات (WPML)</strong> <code>.column-icl_translations { display:none }</code> <span class="why">يعرض أعلام الدول مع حالة الترجمة في كل صف. إدارة الترجمة لها قسمها الخاص — لا حاجة لتكرارها في كل جدول محتوى.</span></div>
+      <div class="ann hide"><strong>عمود SEO في الجدول</strong> <code>.column-rank_math_seo_details { display:none }</code> <span class="why">يعرض "N/A" في معظم الحالات — لا قيمة معلوماتية فعلية في سياق الجدول. المستخدم الذي يحتاج SEO يصل إليه من داخل صفحة التحرير.</span></div>
+      <div class="ann hide"><strong>عمود Slug</strong> <code>.column-slug { display:none }</code> <span class="why">رمز URL الداخلي — مصطلح تقني لا يحتاجه المستخدم في الجدول. WP يُنشئه تلقائياً من العنوان.</span></div>
+      <div class="ann hide"><strong>Bulk Actions العلوية</strong> <code>.tablenav.top .bulkactions { display:none }</code> <span class="why">الإجراءات المجمّعة (حذف/تعديل مجموعة) ميزة متقدمة. الإبقاء على نسخة واحدة في الأسفل كافٍ لمن يحتاجها.</span></div>
+      <div class="ann style"><strong>تكبير الصور المصغرة</strong> من ٣٢px إلى ٤٨px مع حواف مستديرة. <span class="why">٣٢ بكسل صغيرة جداً للتعرف على المحتوى. الصور المصغرة يجب أن تكون مفيدة للتعرف السريع بدون قراءة العنوان.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 3. EDIT FORM ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>٣. نموذج الإضافة/التحرير</h3>
+      <div class="comp-pages"><span class="cp">أضف درس</span><span class="cp">أضف سلسلة</span><span class="cp">أضف مقالة</span><span class="cp">أضف سؤال</span><span class="cp">أضف بودكاست</span><span class="cp">أضف فائدة</span></div>
+    </div>
+    <div class="comp-code" id="code-edit">
+      <h4>CSS — تنسيق حقول التحرير</h4>
+<pre>/* Hide permalink/slug */
+#edit-slug-box, #slugdiv, .edit-slug { display: none !important; }
+
+/* Hide author metabox */
+#authordiv { display: none !important; }
+
+/* Rank Math SEO — collapsed state */
+#rank_math_metabox.closed .inside { display: none; }
+.rank-math-tooltip, .rank-math-status,
+.rank-math-score { display: none !important; }
+
+/* Title field — larger, cleaner */
+#title, #titlewrap input {
+  font-size: 22px !important; padding: 12px 16px !important;
+  border: 2px solid #e2e8f0 !important; border-radius: 8px !important;
+}
+#title:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
+}
+
+/* Publish button — prominent */
+#publish, #submitdiv .button-primary {
+  background: #16a34a !important; border-color: #15803d !important;
+  border-radius: 6px !important; padding: 8px 24px !important;
+  font-size: 14px !important;
+}
+
+/* Better metabox styling */
+.postbox {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+}</pre>
+    </div>
+    <div class="comp-pane">
+      <span class="comp-label before">الوضع الحالي (لقطة حقيقية)</span>
+      <div class="screenshot-scroll"><img src="screenshots/05-أضف-درس.png" alt="Edit form — current"></div>
+    </div>
+    <div class="comp-pane" id="pane-edit">
+      <span class="comp-label after">بعد التحسين</span>
+      <div class="view-bar">
+        <span class="vb active" data-mode="annotated" onclick="setView('pane-edit','annotated')">⚙ مع التوضيحات</span>
+        <span class="vb" data-mode="clean" onclick="setView('pane-edit','clean')">✓ المظهر النهائي</span>
+        <span class="vb" data-mode="code" onclick="setView('pane-edit','code')">{ } الكود</span>
+        <span class="vb-full" onclick="viewFull('pane-edit')">↗ عرض كامل</span>
+      </div>
+      <div class="after-content" style="background:#f0f2f5;border-radius:var(--r);overflow:hidden;border:1px solid var(--s200)">
+        <!-- Admin Bar -->
+        <div style="background:#1e293b;color:#94a3b8;font-size:12px;padding:6px 16px;display:flex;justify-content:space-between">
+          <div style="display:flex;gap:12px;align-items:center"><span class="mp-dim" style="margin:0;padding:2px 4px;font-size:10px">🇸🇦 العربية</span><span>+ جديد</span><span>🔍</span></div>
+          <span style="color:#fff">مرحباً، المستخدم</span>
+        </div>
+        <div style="display:flex">
+          <!-- Sidebar -->
+          <div style="width:180px;background:#1e293b;padding:12px 0;flex-shrink:0">
+            <div style="text-align:center;color:#fff;font-size:15px;font-weight:700;padding:4px 0 14px">أعلام</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">الرئيسية</div>
+            <div style="background:#16a34a;color:#fff;padding:7px 14px;font-size:12px;border-radius:0 6px 6px 0;margin-left:6px">الدروس</div>
+            <div style="color:#fff;padding:6px 12px 6px 20px;font-size:11px;background:#0f172a">— أضف درس</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">السلاسل العلمية</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">المقالات</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">أسئلة وأجوبة</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">الصفحات الثابتة</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">بودكاست</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">فوائد</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">الدروس العلمية</div>
+            <div class="mp-dim" style="color:#94a3b8;padding:7px 14px;font-size:12px;margin:2px 6px;opacity:0.4">أدوات</div>
+            <div style="padding:7px 14px;font-size:12px" class="mp-rename"><span style="color:#94a3b8">الترجمة</span></div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">وسائط</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">أعضاء</div>
+          </div>
+          <!-- Main area: two columns like WP -->
+          <div style="flex:1;padding:16px;background:#f0f2f5">
+            <div style="font-size:18px;font-weight:700;margin-bottom:12px">أضف درس جديد</div>
+            <div style="display:flex;gap:14px">
+              <!-- RIGHT: Main editor column -->
+              <div style="flex:1">
+                <!-- Title -->
+                <div class="mp-sty">
+                  <div style="border:2px solid var(--s200);border-radius:8px;padding:12px 16px;font-size:16px"><span style="color:var(--s400)">إضافة عنوان</span></div>
+                </div>
+                <!-- Permalink -->
+                <div class="mp-dim">
+                  <div style="font-size:11px;color:var(--s400)">الرابط الدائم: https://…/lesson/٢٠٢٥٠٨١٣ <span style="color:#2563eb">تعديل</span></div>
+                </div>
+                <!-- Editor with Visual/Text tabs -->
+                <div style="margin:8px 0">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-end">
+                    <div style="display:flex">
+                      <span style="background:#fff;border:1px solid var(--s200);border-bottom:none;padding:4px 12px;font-size:11px;font-weight:600;border-radius:4px 4px 0 0">مرئي</span>
+                      <span style="background:var(--s100);border:1px solid var(--s200);border-bottom:none;padding:4px 12px;font-size:11px;color:var(--s500);border-radius:4px 4px 0 0;margin-right:-1px">نص</span>
+                    </div>
+                  </div>
+                  <div style="background:var(--s50);padding:6px 10px;border:1px solid var(--s200);border-bottom:none;display:flex;gap:3px;flex-wrap:wrap;align-items:center">
+                    <span style="font-size:11px;padding:2px 6px;font-weight:700">B</span><span style="font-size:11px;padding:2px 6px;font-style:italic">I</span><span style="font-size:11px;padding:2px 6px;text-decoration:line-through">S</span><span style="font-size:11px;padding:2px 6px">🔗</span><span style="font-size:11px;padding:2px 6px">""</span><span style="font-size:11px;padding:2px 6px">ul</span><span style="font-size:11px;padding:2px 6px">ol</span><span style="font-size:11px;padding:2px 6px">◀</span><span style="font-size:11px;padding:2px 6px">▶</span><span style="font-size:11px;padding:2px 6px">📋</span><span style="font-size:11px;padding:2px 6px">🖼</span><span style="font-size:11px;padding:2px 6px">—</span><span style="font-size:11px;padding:2px 6px">⏎</span>
+                    <span style="font-size:11px;padding:2px 6px;margin-right:auto;color:var(--s400)">▼ أدوات إضافية</span>
+                  </div>
+                  <div style="border:1px solid var(--s200);padding:14px;min-height:120px;background:#fff;color:var(--s400);font-size:13px">محتوى الدرس...</div>
+                  <div style="border:1px solid var(--s200);border-top:none;padding:4px 10px;font-size:10px;color:var(--s400);background:var(--s50)">عدد الكلمات: 0</div>
+                </div>
+                <!-- Excerpt -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin:10px 0">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">المقتطف</div>
+                  <div style="padding:10px 14px">
+                    <div style="border:1px solid var(--s200);border-radius:4px;padding:6px 10px;min-height:40px;font-size:12px;color:var(--s400)">ملخص قصير...</div>
+                    <div style="font-size:10px;color:var(--s400);margin-top:4px">المقتطفات هي ملخصات اختيارية مكتوبة يدوياً للمحتوى</div>
+                  </div>
+                </div>
+                <!-- Rank Math SEO — COLLAPSED -->
+                <div class="mp-col">
+                  <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden">
+                    <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;display:flex;justify-content:space-between;cursor:pointer">
+                      <span>Rank Math SEO</span><span style="color:var(--s400);font-size:11px">◀ مطوي افتراضياً — انقر للتوسيع</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Permalink row -->
+                <div class="mp-dim" style="margin:6px 0">
+                  <div style="font-size:11px;color:var(--s500);display:flex;gap:6px;align-items:center">
+                    <span>Permalink:</span>
+                    <span style="direction:ltr;color:var(--s400)">https://muslimat-admin-testing.aalaam.jo/ar/ur/lesson/65</span>
+                  </div>
+                </div>
+                <!-- Author metabox -->
+                <div class="mp-dim">
+                  <div style="font-size:12px;padding:6px 0">المؤلف: <strong>Muslimat Admin</strong> <span style="color:#2563eb;font-size:11px">تصفح</span></div>
+                </div>
+                <!-- حقول الدرس (Lesson Fields) -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin:10px 0">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">حقول الدرس</div>
+                  <div style="padding:10px 14px;font-size:12px;line-height:2.4">
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                      <span style="width:120px;font-weight:600;color:var(--s600)">عنوان مختصر:</span>
+                      <div style="flex:1;border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400);font-size:11px">العنوان المختصر</div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                      <span style="width:120px;font-weight:600;color:var(--s600)">رابط الدرس الأول:</span>
+                      <div style="flex:1;border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400);font-size:11px;direction:ltr;text-align:left">https://</div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                      <span style="width:120px;font-weight:600;color:var(--s600)">نظم الدرس الأول:</span>
+                      <div style="flex:1;border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400);font-size:11px">رقم الدرس</div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                      <span style="width:120px;font-weight:600;color:var(--s600)">حالة المراجعة:</span>
+                      <div style="display:flex;gap:10px"><label>○ تمت المراجعة</label><label>○ بانتظار المراجعة</label><label>● لم تتم المراجعة</label></div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                      <span style="width:120px;font-weight:600;color:var(--s600)">الملخص الصوتي:</span>
+                      <div style="flex:1;border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400);font-size:11px;direction:ltr;text-align:left">https://</div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                      <span style="width:120px;font-weight:600;color:var(--s600)">ترتيب العرض:</span>
+                      <div style="width:60px;border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400);font-size:11px;text-align:center">0</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- حقول المعين (second editor) -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin:10px 0">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">حقول المعين</div>
+                  <div style="padding:10px 14px">
+                    <div style="display:flex;margin-bottom:0">
+                      <span style="background:#fff;border:1px solid var(--s200);border-bottom:none;padding:3px 10px;font-size:10px;font-weight:600;border-radius:4px 4px 0 0">مرئي</span>
+                      <span style="background:var(--s100);border:1px solid var(--s200);border-bottom:none;padding:3px 10px;font-size:10px;color:var(--s500);border-radius:4px 4px 0 0;margin-right:-1px">نص</span>
+                    </div>
+                    <div style="background:var(--s50);padding:4px 8px;border:1px solid var(--s200);border-bottom:none;display:flex;gap:2px;flex-wrap:wrap">
+                      <span style="font-size:10px;padding:1px 4px;font-weight:700">B</span><span style="font-size:10px;padding:1px 4px;font-style:italic">I</span><span style="font-size:10px;padding:1px 4px">🔗</span><span style="font-size:10px;padding:1px 4px">ul</span><span style="font-size:10px;padding:1px 4px">ol</span><span style="font-size:10px;padding:1px 4px">📋</span>
+                    </div>
+                    <div style="border:1px solid var(--s200);padding:10px;min-height:70px;background:#fff;color:var(--s400);font-size:12px">محتوى إضافي...</div>
+                  </div>
+                </div>
+              </div>
+              <!-- LEFT: Sidebar widgets column -->
+              <div style="width:220px;flex-shrink:0">
+                <!-- Publish box -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin-bottom:10px">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">النشر</div>
+                  <div style="padding:10px 14px;font-size:12px;line-height:2.2">
+                    <div>الحالة: <strong>مسودة</strong> <span style="color:#2563eb;font-size:11px">تعديل</span></div>
+                    <div>الرؤية: <strong>عامة</strong> <span style="color:#2563eb;font-size:11px">تعديل</span></div>
+                    <div>المراجعات: <span style="color:#2563eb;font-size:11px">تصفح</span></div>
+                    <div>النشر: <strong>فوراً</strong> <span style="color:#2563eb;font-size:11px">تعديل</span></div>
+                    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+                      <span style="border:1px solid var(--s300);padding:4px 10px;border-radius:4px;font-size:11px">حفظ مسودة</span>
+                      <span style="border:1px solid var(--s300);padding:4px 10px;border-radius:4px;font-size:11px">معاينة</span>
+                    </div>
+                    <div class="mp-sty" style="margin-top:8px">
+                      <span style="background:var(--g600);color:#fff;padding:6px 20px;border-radius:6px;font-size:13px;font-weight:600;display:block;text-align:center">نشر</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Taxonomy -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin-bottom:10px">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">شجرة التصنيفات</div>
+                  <div style="padding:10px 14px;font-size:12px;line-height:2">
+                    <div>☐ آداب وأخلاق</div>
+                    <div>☐ أحكام الوظائف</div>
+                    <div>☐ فقه المرأة</div>
+                    <div>☐ العدة</div>
+                    <div style="color:#2563eb;font-size:11px;margin-top:4px">+ أضف تصنيف جديد</div>
+                  </div>
+                </div>
+                <!-- Lesson types -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin-bottom:10px">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">أنواع الدروس</div>
+                  <div style="padding:10px 14px;font-size:12px;line-height:2">
+                    <div>☐ إشكالية</div>
+                    <div>☐ صوتي</div>
+                    <div>☐ فيديو</div>
+                    <div>☐ مرئي</div>
+                    <div style="color:#2563eb;font-size:11px;margin-top:4px">+ أضف نوع دروس جديد</div>
+                  </div>
+                </div>
+                <!-- Featured Image -->
+                <div style="border:1px solid var(--s200);border-radius:8px;overflow:hidden;margin-bottom:10px">
+                  <div style="background:var(--s50);padding:8px 14px;font-weight:600;font-size:12px;border-bottom:1px solid var(--s200)">صورة المقالة المميزة</div>
+                  <div style="padding:14px;text-align:center"><div style="width:100%;height:80px;background:var(--s100);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--s400);font-size:12px">تعيين صورة</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="mp-dim" style="padding:4px 16px;font-size:10px;border-top:1px solid var(--s200);margin:0">النسخة 6.6.1</div>
+      </div>
+    </div>
+    <div class="ann-section">
+      <div class="ann-section-title">التغييرات المقترحة للمطور</div>
+      <div class="ann collapse"><strong>Rank Math SEO metabox</strong> — طيّه (collapsed) افتراضياً بدلاً من إخفائه. <code>JS: document.querySelector('#rank_math_metabox').classList.add('closed')</code> <span class="why">SEO مهم — بعض المستخدمين يحتاجونه. لكن عرضه مفتوحاً بنتيجة "9/100" بلون أحمر يُخيف من لا يعرفه. الحل: اطوِه افتراضياً — من يحتاجه ينقر لفتحه، ومن لا يحتاجه لا يراه.</span></div>
+      <div class="ann hide"><strong>permalink/slug</strong> <code>#edit-slug-box { display:none }</code> <span class="why">حقل URL الداخلي — WP يُنشئه تلقائياً من العنوان. عرضه مع زر "تعديل" يُغري بالتغيير، والتغيير الخاطئ يكسر الروابط.</span></div>
+      <div class="ann hide"><strong>حقل المؤلف</strong> <code>remove_meta_box('authordiv',...)</code> <span class="why">يعرض اسم حساب النظام مع زر "تصفح" يسمح بتغيير المؤلف — تغيير خاطئ قد يُسبب مشاكل. المؤلف الحقيقي (العالم/الشيخ) يُعرض بطريقة أخرى على الموقع.</span></div>
+      <div class="ann style"><strong>زر النشر</strong> — تكبير + لون أخضر (#16a34a) + عرض أوسع. <span class="why">الإجراء الأهم في الصفحة يجب أن يكون واضحاً ومطمئناً — زر كبير ومميز بدلاً من زر صغير في زاوية.</span></div>
+      <div class="ann style"><strong>حقل العنوان</strong> — تكبير الخط + حواف مستديرة + تركيز بصري عند النقر. <span class="why">أول حقل يملؤه المستخدم — يجب أن يكون واضحاً ومريحاً.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 4. TAXONOMY ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>٤. صفحات التصنيفات</h3>
+      <div class="comp-pages"><span class="cp">شجرة التصنيفات ×٧</span><span class="cp">أنواع الدروس</span><span class="cp">المصادر</span><span class="cp">الفهارس</span></div>
+    </div>
+    <div class="comp-code" id="code-tax">
+      <h4>CSS — تنظيف صفحات التصنيفات</h4>
+<pre>/* Hide slug field in taxonomy forms */
+.term-slug-wrap, .form-field.term-slug-wrap {
+  display: none !important;
+}
+
+/* Smaller description field */
+.term-description-wrap textarea { height: 60px !important; }
+
+/* Hide language filter */
+.icl_subsubsub, .tablenav .icl_subsubsub {
+  display: none !important;
+}
+
+/* Better form styling */
+.form-field input[type="text"] {
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+}
+.form-field input[type="text"]:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
+}
+
+/* Add taxonomy button */
+#submit, .form-wrap .button {
+  background: #16a34a !important; border-color: #15803d !important;
+  border-radius: 6px !important; color: #fff !important;
+  padding: 8px 20px !important;
+}</pre>
+    </div>
+    <div class="comp-pane">
+      <span class="comp-label before">الوضع الحالي (لقطة حقيقية)</span>
+      <div class="screenshot-scroll"><img src="screenshots/06-شجرة-التصنيفات.png" alt="Taxonomy — current"></div>
+    </div>
+    <div class="comp-pane" id="pane-tax">
+      <span class="comp-label after">بعد التحسين</span>
+      <div class="view-bar">
+        <span class="vb active" data-mode="annotated" onclick="setView('pane-tax','annotated')">⚙ مع التوضيحات</span>
+        <span class="vb" data-mode="clean" onclick="setView('pane-tax','clean')">✓ المظهر النهائي</span>
+        <span class="vb" data-mode="code" onclick="setView('pane-tax','code')">{ } الكود</span>
+        <span class="vb-full" onclick="viewFull('pane-tax')">↗ عرض كامل</span>
+      </div>
+      <div class="after-content" style="background:#f0f2f5;border-radius:var(--r);overflow:hidden;border:1px solid var(--s200)">
+        <div style="background:#1e293b;color:#94a3b8;font-size:12px;padding:6px 16px;display:flex;justify-content:flex-end;gap:12px"><span style="color:#fff">مرحباً، المستخدم</span><span>الرئيسية</span></div>
+        <div style="display:flex">
+          <div style="width:200px;background:#1e293b;padding:12px 0;min-height:350px;flex-shrink:0">
+            <div style="text-align:center;color:#fff;font-size:16px;font-weight:700;padding:4px 0 16px">أعلام</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">الرئيسية</div>
+            <div style="background:#16a34a;color:#fff;padding:8px 16px;font-size:13px;border-radius:0 6px 6px 0;margin-left:8px">الدروس</div>
+            <div style="color:#fff;padding:8px 12px 8px 24px;font-size:12px;background:#0f172a">— شجرة التصنيفات</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">السلاسل العلمية</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">المقالات</div>
+          </div>
+          <div style="flex:1;padding:16px;background:#f0f2f5">
+            <div style="font-size:18px;font-weight:700;margin-bottom:8px">شجرة التصنيفات</div>
+            <!-- Language filter -->
+            <div class="mp-dim" style="margin-bottom:10px"><span style="font-size:11px">العربية (١٠) | جميع اللغات (١٠)</span></div>
+            <!-- Bulk actions -->
+            <div class="mp-dim" style="margin-bottom:10px;display:flex;gap:6px;align-items:center"><select style="font-size:10px;padding:2px 4px;border:1px solid var(--s300);border-radius:3px"><option>إجراءات مجمّعة</option></select><button style="font-size:10px;padding:2px 6px;border:1px solid var(--s300);border-radius:3px;background:#fff">تطبيق</button></div>
+            <div style="background:#fff;border-radius:var(--r);padding:14px;border:1px solid var(--s200)">
+              <div style="display:grid;grid-template-columns:1fr 1.8fr;gap:14px">
+                <!-- Add form -->
+                <div style="border:1px solid var(--s200);border-radius:8px;padding:14px">
+                  <div style="font-weight:600;font-size:13px;margin-bottom:10px">أضف تصنيف جديد</div>
+                  <div style="font-size:11px;color:var(--s500);margin-bottom:3px">الاسم</div>
+                  <div style="border:1.5px solid var(--s200);border-radius:6px;padding:5px 8px;margin-bottom:8px;font-size:12px;color:var(--s400)">اسم التصنيف</div>
+                  <div style="font-size:11px;color:var(--s500);margin-bottom:3px">أب تصنيف</div>
+                  <div style="border:1.5px solid var(--s200);border-radius:6px;padding:5px 8px;margin-bottom:8px;font-size:12px;color:var(--s400)">بدون ▾</div>
+                  <div class="mp-dim" style="margin:8px 0">
+                    <div style="font-size:11px;color:var(--s500)">الاسم اللطيف (Slug)</div>
+                    <div style="border:1px solid var(--s200);border-radius:4px;padding:4px 6px;font-size:11px;color:var(--s400)">اسم-التصنيف</div>
+                  </div>
+                  <div style="font-size:11px;color:var(--s500);margin-bottom:3px">الوصف</div>
+                  <div style="border:1.5px solid var(--s200);border-radius:6px;padding:5px 8px;height:50px;margin-bottom:8px"></div>
+                  <div style="font-size:11px;color:var(--s500);margin-bottom:3px">الصور</div>
+                  <div style="border:1px solid var(--s200);border-radius:6px;padding:8px;text-align:center;margin-bottom:8px"><span style="background:var(--g600);color:#fff;padding:4px 12px;border-radius:4px;font-size:11px">إضافة صورة</span></div>
+                  <div class="mp-dim" style="margin:8px 0">
+                    <div style="font-size:11px;color:var(--s500)">لغة</div>
+                    <div style="font-size:11px">العربية ▾</div>
+                  </div>
+                  <div style="margin-top:8px"><span style="background:var(--g600);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px">أضف تصنيف جديد</span></div>
+                </div>
+                <!-- Table -->
+                <div>
+                  <div style="display:flex;gap:6px;margin-bottom:8px;font-size:11px"><input style="border:1px solid var(--s200);border-radius:4px;padding:3px 6px;font-size:11px" placeholder="بحث شجرة التصنيفات"></div>
+                  <table style="width:100%;border-collapse:collapse;font-size:11px">
+                    <tr style="background:var(--s50);font-weight:600;color:var(--s500)"><td style="padding:6px">☐</td><td style="padding:6px">الاسم</td><td style="padding:6px">الوصف</td><td class="mp-dim" style="padding:6px;margin:0;border:none;opacity:0.3">الاسم اللطيف</td><td style="padding:6px">العدد</td></tr>
+                    <tr><td style="padding:6px">☐</td><td style="padding:6px;font-weight:600;color:var(--g700)">آداب وأخلاق</td><td style="padding:6px;color:var(--s400)">—</td><td style="padding:6px;color:var(--s300)">—</td><td style="padding:6px">٣٥٥</td></tr>
+                    <tr style="border-top:1px solid var(--s100)"><td style="padding:6px">☐</td><td style="padding:6px;font-weight:600;color:var(--g700)">أحكام الوظائف</td><td style="padding:6px;color:var(--s400)">—</td><td style="padding:6px;color:var(--s300)">—</td><td style="padding:6px">٥٢</td></tr>
+                    <tr style="border-top:1px solid var(--s100)"><td style="padding:6px">☐</td><td style="padding:6px;font-weight:600;color:var(--g700)">الزينة</td><td style="padding:6px;color:var(--s400)">—</td><td style="padding:6px;color:var(--s300)">—</td><td style="padding:6px">٥٦</td></tr>
+                    <tr style="border-top:1px solid var(--s100)"><td style="padding:6px">☐</td><td style="padding:6px;font-weight:600;color:var(--g700)">العدة</td><td style="padding:6px;color:var(--s400)">—</td><td style="padding:6px;color:var(--s300)">—</td><td style="padding:6px">٦٧</td></tr>
+                    <tr style="border-top:1px solid var(--s100)"><td style="padding:6px">☐</td><td style="padding:6px;font-weight:600;color:var(--g700)">القرآن العظيم</td><td style="padding:6px;color:var(--s400)">—</td><td style="padding:6px;color:var(--s300)">—</td><td style="padding:6px">٢٣١</td></tr>
+                    <tr style="border-top:1px solid var(--s100)"><td style="padding:6px">☐</td><td style="padding:6px;font-weight:600;color:var(--g700)">فضائل</td><td style="padding:6px;color:var(--s400)">—</td><td style="padding:6px;color:var(--s300)">—</td><td style="padding:6px">٢٢٩</td></tr>
+                  </table>
+                  <div style="font-size:10px;color:var(--s400);margin-top:6px">٢٢ عنصر · صفحة 1 من 2</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ann-section">
+      <div class="ann-section-title">التغييرات المقترحة للمطور</div>
+      <div class="ann hide"><strong>حقل Slug من نموذج الإضافة</strong> <code>.term-slug-wrap { display:none }</code> <span class="why">WP يُنشئ الـ slug تلقائياً من الاسم. عرض هذا الحقل يُغري بملئه بشيء قد يكسر الروابط.</span></div>
+      <div class="ann hide"><strong>فلتر اللغة</strong> <code>.icl_subsubsub { display:none }</code> <span class="why">المحتوى يُدار بالعربية. فلتر "العربية | الإنجليزية" أعلى الجدول يُضيف عنصر تفاعلي لا حاجة له.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 5. MEDIA ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>٥. مكتبة الوسائط</h3>
+    </div>
+    <div class="comp-code" id="code-media">
+      <h4>CSS — إخفاء فلتر اللغة</h4>
+<pre>/* Hide WPML language filter in media library */
+.media-toolbar .wpml-media-lang-selector,
+.media-toolbar-secondary .wpml-media-lang-selector,
+select.wpml-media-lang-filter {
+  display: none !important;
+}</pre>
+    </div>
+    <div class="comp-pane">
+      <span class="comp-label before">الوضع الحالي (لقطة حقيقية)</span>
+      <div class="screenshot-scroll"><img src="screenshots/45-وسائط.png" alt="Media — current"></div>
+    </div>
+    <div class="comp-pane" id="pane-media">
+      <span class="comp-label after">بعد التحسين</span>
+      <div class="view-bar">
+        <span class="vb active" data-mode="annotated" onclick="setView('pane-media','annotated')">⚙ مع التوضيحات</span>
+        <span class="vb" data-mode="clean" onclick="setView('pane-media','clean')">✓ المظهر النهائي</span>
+        <span class="vb" data-mode="code" onclick="setView('pane-media','code')">{ } الكود</span>
+        <span class="vb-full" onclick="viewFull('pane-media')">↗ عرض كامل</span>
+      </div>
+      <div class="after-content" style="background:#f0f2f5;border-radius:var(--r);overflow:hidden;border:1px solid var(--s200)">
+        <div style="background:#1e293b;color:#94a3b8;font-size:12px;padding:6px 16px;display:flex;justify-content:flex-end;gap:12px"><span style="color:#fff">مرحباً، المستخدم</span><span>الرئيسية</span></div>
+        <div style="display:flex">
+          <div style="width:200px;background:#1e293b;padding:12px 0;min-height:200px;flex-shrink:0">
+            <div style="text-align:center;color:#fff;font-size:16px;font-weight:700;padding:4px 0 16px">أعلام</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">الرئيسية</div>
+            <div style="color:#94a3b8;padding:8px 16px;font-size:13px">الدروس</div>
+            <div style="background:#16a34a;color:#fff;padding:8px 16px;font-size:13px;border-radius:0 6px 6px 0;margin-left:8px">الوسائط</div>
+          </div>
+          <div style="flex:1;padding:16px;background:#f0f2f5">
+            <div style="background:#fff;border-radius:var(--r);padding:14px;border:1px solid var(--s200)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:18px;font-weight:700">مكتبة الوسائط</span>
+                  <span style="background:var(--g600);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px">+ أضف جديد</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="mp-dim" style="margin:0"><select style="font-size:10px;padding:3px 6px;border:1px solid var(--s300);border-radius:4px"><option>جميع اللغات</option><option>العربية</option></select></div>
+                  <span style="font-size:11px;color:var(--s500)">☷ شبكة</span>
+                  <span style="font-size:11px;color:var(--s400)">☰ قائمة</span>
+                  <input style="font-size:11px;padding:4px 8px;border:1px solid var(--s200);border-radius:4px;width:120px" placeholder="بحث الوسائط...">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px;border:2px solid var(--g500)"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+                <div style="aspect-ratio:1;background:var(--s200);border-radius:6px"></div>
+              </div>
+              <div style="font-size:11px;color:var(--s400);padding-top:10px;display:flex;justify-content:space-between"><span>١٠ من ٣٤٨ عنصر</span><span>« ١ ٢ ٣ ... ٣٥ »</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ann-section">
+      <div class="ann-section-title">التغييرات المقترحة للمطور</div>
+      <div class="ann hide"><strong>فلتر اللغة WPML</strong> <code>select.wpml-media-lang-filter { display:none }</code> <span class="why">فلتر اللغات في مكتبة الصور يُضيف عنصر واجهة بدون قيمة عملية — المحتوى بالعربية.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 6. PROFILE ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>٦. الملف الشخصي (حسابك)</h3>
+    </div>
+    <div class="comp-code" id="code-profile">
+      <h4>CSS — تنظيف الملف الشخصي</h4>
+<pre>/* Hide Rank Math SEO section */
+.rank-math-person-social, .rank-math-user-wrap,
+[class*="rank-math"] { display: none !important; }
+
+/* Hide WPML language settings */
+.wpml-section, tr.wpml-language-select { display: none !important; }
+
+/* Hide visual editor disable option */
+.user-rich-editing-wrap { display: none !important; }
+
+/* Hide keyboard shortcuts option */
+.user-comment-shortcuts-wrap { display: none !important; }
+
+/* Hide toolbar option */
+.user-admin-bar-front-wrap, .show-admin-bar {
+  display: none !important;
+}</pre>
+    </div>
+    <div class="comp-pane">
+      <span class="comp-label before">الوضع الحالي (لقطة حقيقية)</span>
+      <div class="screenshot-scroll"><img src="screenshots/49-حسابك.png" alt="Profile — current"></div>
+    </div>
+    <div class="comp-pane" id="pane-profile">
+      <span class="comp-label after">بعد التحسين</span>
+      <div class="view-bar">
+        <span class="vb active" data-mode="annotated" onclick="setView('pane-profile','annotated')">⚙ مع التوضيحات</span>
+        <span class="vb" data-mode="clean" onclick="setView('pane-profile','clean')">✓ المظهر النهائي</span>
+        <span class="vb" data-mode="code" onclick="setView('pane-profile','code')">{ } الكود</span>
+        <span class="vb-full" onclick="viewFull('pane-profile')">↗ عرض كامل</span>
+      </div>
+      <div class="after-content" style="background:#f0f2f5;border-radius:var(--r);overflow:hidden;border:1px solid var(--s200)">
+        <div style="background:#1e293b;color:#94a3b8;font-size:12px;padding:6px 16px;display:flex;justify-content:space-between"><div style="display:flex;gap:12px;align-items:center"><span class="mp-dim" style="margin:0;padding:2px 4px;font-size:10px">🇸🇦 العربية</span><span>+ جديد</span></div><span style="color:#fff">مرحباً، المستخدم</span></div>
+        <div style="display:flex">
+          <div style="width:180px;background:#1e293b;padding:12px 0;flex-shrink:0">
+            <div style="text-align:center;color:#fff;font-size:15px;font-weight:700;padding:4px 0 14px">أعلام</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">الرئيسية</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">الدروس</div>
+            <div style="color:#94a3b8;padding:7px 14px;font-size:12px">وسائط</div>
+            <div style="background:#16a34a;color:#fff;padding:7px 14px;font-size:12px;border-radius:0 6px 6px 0;margin-left:6px">أعضاء</div>
+          </div>
+          <div style="flex:1;padding:16px;background:#f0f2f5">
+            <div style="font-size:18px;font-weight:700;margin-bottom:12px">حسابك</div>
+            <div style="background:#fff;border-radius:var(--r);padding:16px;border:1px solid var(--s200);font-size:12px;line-height:2">
+              <!-- إعدادات شخصية -->
+              <div style="font-size:14px;font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">إعدادات شخصية</div>
+              <!-- Color scheme — KEPT, not removed -->
+              <div style="margin:8px 0">
+                <div style="font-weight:600;margin-bottom:4px">لون ثيمة الإدارة</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <span style="width:20px;height:20px;background:#1d2327;border-radius:3px;border:2px solid var(--g600);display:inline-block"></span>
+                  <span style="width:20px;height:20px;background:#2271b1;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                  <span style="width:20px;height:20px;background:#e65100;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                  <span style="width:20px;height:20px;background:#4a0072;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                  <span style="width:20px;height:20px;background:#0073aa;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                  <span style="width:20px;height:20px;background:#c62828;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                  <span style="width:20px;height:20px;background:#111;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                  <span style="width:20px;height:20px;background:#007500;border-radius:3px;display:inline-block;border:1px solid var(--s200)"></span>
+                </div>
+              </div>
+              <div class="mp-dim" style="margin:8px 0"><label>☐ اختصارات لوحة المفاتيح</label></div>
+              <div class="mp-dim" style="margin:8px 0"><label>☐ شريط الأدوات — إظهار شريط الأدوات عند عرض الموقع</label></div>
+              <div style="margin:8px 0"><span style="font-weight:600">اللغة:</span> العربية ▾</div>
+              <!-- Visual editor -->
+              <div class="mp-dim" style="margin:8px 0">
+                <div style="font-weight:600">إعدادات ثيمة المنشئ</div>
+                <label>☐ تعطيل المحرر المرئي</label>
+              </div>
+              <!-- WPML -->
+              <div class="mp-dim" style="margin:8px 0">
+                <div style="font-weight:600">إعدادات WPML لثغة</div>
+                <div>اللغة الافتراضية للمحرر: العربية</div>
+              </div>
+              <!-- Name section -->
+              <div style="font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">الاسم</div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:6px 12px;align-items:center">
+                <span style="font-weight:600">اسم المستخدم:</span><span style="color:var(--s400)">admin (لا يمكن تغييره)</span>
+                <span style="font-weight:600">الاسم الأول:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:4px 8px">عمر</div>
+                <span style="font-weight:600">اسم العائلة:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:4px 8px">المساري</div>
+                <span style="font-weight:600">الاسم المستعار:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400)">admin</div>
+                <span style="font-weight:600">الاسم المعروض:</span><span>admin ▾</span>
+              </div>
+              <!-- Contact -->
+              <div style="font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">معلومات الإتصال</div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:6px 12px;align-items:center">
+                <span style="font-weight:600">البريد الإلكتروني:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:4px 8px">user@example.com</div>
+                <span style="font-weight:600">الموقع:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:4px 8px;color:var(--s400)">https://</div>
+              </div>
+              <!-- Rank Math SEO in profile -->
+              <div class="mp-dim" style="margin:12px 0">
+                <div style="font-size:14px;font-weight:700;margin-bottom:6px">Rank Math SEO</div>
+                <div style="display:grid;grid-template-columns:120px 1fr;gap:4px 12px">
+                  <span>حساب Twitter/X:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:3px 6px;color:var(--s400)">@username</div>
+                  <span>حساب Facebook:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:3px 6px;color:var(--s400)">URL</div>
+                  <span>الوصف:</span><div style="border:1px solid var(--s200);border-radius:4px;padding:3px 6px;min-height:30px"></div>
+                </div>
+              </div>
+              <!-- Bio -->
+              <div style="font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">نبذة عن المستخدم</div>
+              <div style="border:1px solid var(--s200);border-radius:4px;padding:8px;min-height:40px;color:var(--s400)">سيرة ذاتية قصيرة...</div>
+              <!-- Avatar -->
+              <div style="font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">صورة الحساب</div>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:48px;height:48px;background:var(--s200);border-radius:50%"></div><span style="color:var(--s400)">Gravatar</span></div>
+              <!-- Password -->
+              <div style="font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">كلمة المرور</div>
+              <div><span style="background:var(--s100);border:1px solid var(--s200);padding:4px 12px;border-radius:4px;font-size:12px">إنشاء كلمة مرور</span></div>
+              <!-- Sessions -->
+              <div style="font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--s200)">إدارة الجلسات</div>
+              <div style="color:var(--s500)">أنت مسجّل الدخول حالياً</div>
+              <!-- Submit -->
+              <div class="mp-sty" style="margin-top:16px"><span style="background:var(--g600);color:#fff;padding:8px 24px;border-radius:6px;font-size:13px;font-weight:600;display:inline-block">تحديث الملف الشخصي</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mp-dim" style="padding:4px 16px;font-size:10px;border-top:1px solid var(--s200);margin:0">النسخة 6.6.1</div>
+      </div>
+    </div>
+    <div class="ann-section">
+      <div class="ann-section-title">التغييرات المقترحة للمطور</div>
+      <div class="ann hide"><strong>حقول Rank Math SEO</strong> <code>[class*="rank-math"] { display:none }</code> <span class="why">حقول (Twitter/X، الوصف الشخصي) مخصصة لعرض بيانات الكاتب في محركات البحث. في هذا السياق، المحتوى منسوب للموقع/العالم وليس لحساب WP.</span></div>
+      <div class="ann hide"><strong>إعدادات WPML</strong> <code>.wpml-section { display:none }</code> <span class="why">خيار "اللغة الافتراضية للمحرر" — تغييره بالخطأ قد يجعل المحرر يفتح بلغة مختلفة.</span></div>
+      <div class="ann hide"><strong>تعطيل المحرر المرئي + الاختصارات + شريط الأدوات</strong> <code>.user-rich-editing-wrap, .user-comment-shortcuts-wrap, .user-admin-bar-front-wrap { display:none }</code> <span class="why">تعطيل المحرر المرئي بالخطأ يُحوّله لـ HTML خام — مستخدم غير تقني لن يعرف كيف يعيده.</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 7. GLOBAL ELEMENTS ========== -->
+  <div class="comp-card">
+    <div class="comp-header">
+      <h3>٧. عناصر عامة (كل الصفحات)</h3>
+    </div>
+    <div class="comp-code vis" id="code-global">
+      <h4>CSS — عناصر عامة</h4>
+<pre>/* Better Arabic text rendering */
+body.rtl, body.rtl #wpcontent, body.rtl #wpbody-content {
+  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic",
+               "Segoe UI", Tahoma, sans-serif;
+  font-size: 14px; line-height: 1.8;
+}
+
+/* Hide WP version number */
+#footer-upgrade, #footer-thankyou { display: none !important; }
+
+/* Hide Screen Options + Help */
+#screen-options-link-wrap, #contextual-help-link-wrap,
+#screen-meta-links { display: none !important; }
+
+/* Hide admin bar language switcher */
+#wpadminbar #wp-admin-bar-WPML_ALS { display: none !important; }
+
+/* All primary buttons — green */
+.button-primary, .wp-core-ui .button-primary {
+  background: #16a34a !important; border-color: #15803d !important;
+  border-radius: 6px !important; text-shadow: none !important;
+}
+
+/* Input fields — green focus ring */
+input[type="text"]:focus, textarea:focus, select:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
+  outline: none !important;
+}</pre>
+    </div>
+    <div class="ann-section" style="border-top:none">
+      <div class="ann-section-title">تغييرات تنطبق على جميع الصفحات</div>
+      <div class="ann hide"><strong>خيارات الشاشة</strong> <code>#screen-meta-links { display:none }</code> <span class="why">هذا الزر يكشف لوحة تحكم لإظهار/إخفاء أعمدة وعناصر. نحن نتحكم بالعناصر المعروضة مسبقاً عبر CSS/PHP — لا نريد المستخدم يُعيد تفعيل ما أخفيناه.</span></div>
+      <div class="ann hide"><strong>مُبدّل اللغة من الشريط العلوي</strong> <code>#wp-admin-bar-WPML_ALS { display:none }</code> <span class="why">ضغطه بالخطأ يُحوّل واجهة لوحة التحكم بالكامل للإنجليزية. استرجاعها يتطلب معرفة بمكان الإعداد — مستخدم غير تقني سيتصل بالدعم.</span></div>
+      <div class="ann hide"><strong>رقم إصدار WordPress</strong> <code>#footer-upgrade { display:none }</code> <span class="why">معلومة تقنية ("نسخة 6.6.1") لا تُفيد المستخدم. قد تُثير قلقاً ("هل النسخة قديمة؟ هل يجب تحديثها؟").</span></div>
+      <div class="ann style"><strong>حجم الخط العربي</strong> — ١٣ → ١٤px + ارتفاع أسطر ١.٤ → ١.٨ <span class="why">WP مصمم للنصوص اللاتينية. النصوص العربية تحتاج مسافة أكبر بين الأسطر بسبب النقاط والتشكيل — بدونها يبدو النص مضغوطاً وصعب القراءة.</span></div>
+      <div class="ann style"><strong>الأزرار الأساسية</strong> — لون أخضر (#16a34a) + حواف مستديرة (6px). <span class="why">اتساق بصري مع اللون الأساسي للمنصة. يمكن تغيير اللون ليتماشى مع هوية الموقع.</span></div>
+      <div class="ann style"><strong>حقول الإدخال</strong> — عند التركيز: حدود خضراء + ظل خفيف. <span class="why">إشارة بصرية واضحة تُخبر المستخدم أين يكتب حالياً.</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== TAB 2: ELEMENT INVENTORY ==================== -->
+<div class="tab-content" id="tab-inventory">
+<div class="inv-wrap">
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">جدول العناصر المشتركة — دليل التغييرات للمطور</h2>
+  <p style="color:var(--s500);margin-bottom:24px;line-height:1.7">كل عنصر يتكرر عبر صفحات متعددة. الهدف: تطبيق التغيير مرة واحدة عالمياً. العمود الأول يوضح شكل العنصر كما يظهر حالياً في لوحة التحكم.</p>
+
+  <table class="inv-table">
+    <thead><tr><th style="width:160px">شكل العنصر</th><th>العنصر</th><th>الإجراء</th><th>الصفحات المتأثرة</th><th>التنفيذ</th><th>السبب</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="el-vis"><div style="display:flex;align-items:center;gap:4px"><span style="background:#ef4444;color:#fff;padding:0 4px;border-radius:2px;font-size:9px;font-weight:700">9/100</span><span style="color:var(--s400);font-size:10px">Rank Math SEO</span></div><div style="font-size:9px;color:#ef4444;margin-top:2px">⚠ الكلمة المفتاحية غير موجودة</div></div></td>
+        <td class="el-name">Rank Math SEO metabox</td>
+        <td><span class="tag tag-collapse">طي</span></td>
+        <td><div class="pages-list"><span>كل صفحات التحرير ×٧</span></div></td>
+        <td class="impl">JS: #rank_math_metabox.classList.add('closed')<br>يبقى قابلاً للتوسيع</td>
+        <td>نتيجة حمراء تُخيف — اطوِه لمن لا يحتاجه. من يحتاج SEO يفتحه بنقرة</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400)">الرابط الدائم:</div><div style="background:var(--s100);padding:2px 4px;border-radius:2px;font-size:9px;direction:ltr">…/lesson/٢٠٢٥٠٨١٣ <span style="color:#2563eb">تعديل</span></div></div></td>
+        <td class="el-name">permalink / slug</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل صفحات التحرير ×٧</span></div></td>
+        <td class="impl">PHP: remove_meta_box('slugdiv')<br>CSS: #edit-slug-box { display:none }</td>
+        <td>تعديله بالخطأ يكسر الروابط — WP يُنشئه تلقائياً</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400)">المؤلف:</div><div style="font-size:10px">Muslimat Admin <span style="color:#2563eb;font-size:9px">تصفح</span></div></div></td>
+        <td class="el-name">حقل المؤلف</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل صفحات التحرير ×٧</span></div></td>
+        <td class="impl">PHP: remove_meta_box('authordiv')</td>
+        <td>اسم حساب تقني مع زر "تصفح" يسمح بتغيير المؤلف بالخطأ</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400);max-width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">حكم صلاة المرأة في المسجد وما يتعلق بذلك من...</div></div></td>
+        <td class="el-name">عمود المحتوى/المقتطف</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل جداول المحتوى ×٧</span></div></td>
+        <td class="impl">PHP: unset($columns['content'])<br>CSS: .column-content { display:none }</td>
+        <td>مقتطف مبتور — المستخدم يفتح المنشور للقراءة</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="display:flex;gap:2px;align-items:center"><span style="font-size:14px">🇸🇦</span><span style="font-size:14px">🇬🇧</span><span style="font-size:9px;color:var(--s400)">+</span></div></div></td>
+        <td class="el-name">أعمدة أعلام اللغات (WPML)</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل جداول المحتوى ×٧</span></div></td>
+        <td class="impl">PHP: unset where key contains 'icl_translations'<br>CSS: .column-icl_translations { display:none }</td>
+        <td>إدارة الترجمة لها قسمها الخاص</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:10px;color:var(--s400)">N/A</div></div></td>
+        <td class="el-name">عمود SEO في الجدول</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل جداول المحتوى ×٧</span></div></td>
+        <td class="impl">CSS: .column-rank_math_seo_details { display:none }</td>
+        <td>يعرض "N/A" — لا قيمة في الجدول. SEO يُدار من صفحة التحرير</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="display:flex;gap:4px;align-items:center"><select style="font-size:9px;padding:1px 2px;border:1px solid var(--s300);border-radius:2px"><option>إجراءات مجمّعة</option></select><button style="font-size:9px;padding:1px 4px;border:1px solid var(--s300);border-radius:2px;background:#fff">تطبيق</button></div></div></td>
+        <td class="el-name">Bulk Actions العلوية</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل جداول المحتوى ×٧</span></div></td>
+        <td class="impl">CSS: .tablenav.top .bulkactions { display:none }</td>
+        <td>ميزة متقدمة — الإبقاء على نسخة الأسفل كافٍ</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="width:28px;height:28px;background:var(--s200);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--s400)">٣٢px</div></div></td>
+        <td class="el-name">الصور المصغرة في الجداول</td>
+        <td><span class="tag tag-style">تنسيق</span></td>
+        <td><div class="pages-list"><span>كل جداول المحتوى ×٧</span></div></td>
+        <td class="impl">CSS: td img { width:60px; height:60px; border-radius:6px }</td>
+        <td>٣٢px صغيرة جداً للتعرف على المحتوى</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400)">الاسم اللطيف:</div><div style="border:1px solid var(--s300);border-radius:2px;padding:1px 4px;font-size:9px;color:var(--s400)">اسم-التصنيف</div></div></td>
+        <td class="el-name">حقل Slug في التصنيفات</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>شجرة التصنيفات ×٧</span><span>أنواع</span><span>مصادر</span><span>فهارس</span></div></td>
+        <td class="impl">CSS: .term-slug-wrap { display:none }</td>
+        <td>WP يُنشئه تلقائياً — عرضه يُغري بالتعديل الخاطئ</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;display:flex;gap:4px"><span style="border-bottom:1px solid var(--s800)">العربية (١٠)</span><span style="color:var(--s400)">| الإنجليزية (٠)</span></div></div></td>
+        <td class="el-name">فلتر اللغة (WPML)</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل التصنيفات</span><span>الوسائط</span></div></td>
+        <td class="impl">CSS: .icl_subsubsub { display:none }<br>CSS: select.wpml-media-lang-filter { display:none }</td>
+        <td>المحتوى يُدار بالعربية — فلتر اللغات ضوضاء بصرية</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;border:1px solid var(--s300);border-radius:2px;padding:1px 6px;display:inline-block;color:var(--s500)">▼ خيارات الشاشة</div></div></td>
+        <td class="el-name">خيارات الشاشة</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل الصفحات</span></div></td>
+        <td class="impl">CSS: #screen-meta-links { display:none }</td>
+        <td>نتحكم بالأعمدة مسبقاً — لا نريد إعادة تفعيل ما أخفيناه</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="display:flex;align-items:center;gap:2px;font-size:10px"><span>🇸🇦</span><span style="color:var(--s400)">العربية ▼</span></div></div></td>
+        <td class="el-name">مُبدّل اللغة (شريط علوي)</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل الصفحات</span></div></td>
+        <td class="impl">CSS: #wp-admin-bar-WPML_ALS { display:none }</td>
+        <td>ضغطه بالخطأ يُحوّل الواجهة للإنجليزية</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400)">النسخة 6.6.1</div></div></td>
+        <td class="el-name">رقم إصدار WordPress</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>كل الصفحات</span></div></td>
+        <td class="impl">CSS: #footer-upgrade { display:none }</td>
+        <td>معلومة تقنية + كشف أمني للإصدار</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400)">Taxonomy Order <span style="color:#2563eb">›</span></div></div></td>
+        <td class="el-name">Taxonomy Order (قائمة فرعية)</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>قائمة فرعية ×٧</span></div></td>
+        <td class="impl">PHP: remove_submenu_page()<br>CSS: a[href*="to-interface-"] { display:none }</td>
+        <td>صفحة إنجليزية مع إعلانات ترويجية</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:10px;display:flex;align-items:center;gap:3px"><span>🔧</span><span>أدوات</span></div></div></td>
+        <td class="el-name">قائمة "أدوات"</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>الشريط الجانبي</span></div></td>
+        <td class="impl">PHP: remove_menu_page('tools.php')</td>
+        <td>صفحة فارغة — عنصر قائمة بدون محتوى</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:10px;display:flex;align-items:center;gap:3px"><span>🌐</span><span>WPML</span></div></div></td>
+        <td class="el-name">"WPML" في القائمة</td>
+        <td><span class="tag tag-rename">تسمية</span></td>
+        <td><div class="pages-list"><span>الشريط الجانبي</span></div></td>
+        <td class="impl">PHP: $menu item[0] = 'الترجمة'</td>
+        <td>سمّ الأشياء بما تفعله ("الترجمة") لا بما هي ("WPML")</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px;color:var(--s400)">حساب Twitter/X:</div><div style="border:1px solid var(--s300);border-radius:2px;padding:1px 4px;font-size:9px;color:var(--s400)">@username</div></div></td>
+        <td class="el-name">حقول SEO بالملف الشخصي</td>
+        <td><span class="tag tag-hide">إخفاء</span></td>
+        <td><div class="pages-list"><span>حسابك</span></div></td>
+        <td class="impl">CSS: [class*="rank-math"] { display:none }</td>
+        <td>حقول تقنية لعرض بيانات في محركات البحث — لا تخص المستخدم</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:9px">مدير لوحة تحكم نظام إدارة المحتوى</div></div></td>
+        <td class="el-name">اسم الدور</td>
+        <td><span class="tag tag-rename">تسمية</span></td>
+        <td><div class="pages-list"><span>الأعضاء</span></div></td>
+        <td class="impl">PHP: $wp_roles->roles[$slug]['name'] = 'مدير المحتوى'</td>
+        <td>٧ كلمات كثيرة — "مدير المحتوى" أوضح وأقصر</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="background:var(--s100);border-radius:4px;padding:4px 8px;text-align:center"><div style="font-size:9px;color:var(--s400)">صفحة فارغة</div><div style="font-size:16px;color:var(--s300)">∅</div></div></div></td>
+        <td class="el-name">الصفحة الرئيسية (Dashboard)</td>
+        <td><span class="tag tag-add">إضافة</span></td>
+        <td><div class="pages-list"><span>الرئيسية</span></div></td>
+        <td class="impl">PHP: add_action('welcome_panel', ...)<br>شبكة بطاقات روابط لكل نوع محتوى</td>
+        <td>الصفحة الرئيسية فارغة — بطاقات سريعة تعطي المستخدم نقطة بداية</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="font-size:10px;font-family:monospace">Aa <span style="font-size:8px;color:var(--s400)">13px / 1.4</span></div></div></td>
+        <td class="el-name">الخط العربي + ارتفاع الأسطر</td>
+        <td><span class="tag tag-style">تنسيق</span></td>
+        <td><div class="pages-list"><span>كل الصفحات</span></div></td>
+        <td class="impl">CSS: body.rtl { font-family:"IBM Plex Sans Arabic"; font-size:14px; line-height:1.8 }</td>
+        <td>WP مصمم للاتينية — العربية تحتاج ارتفاع أسطر أكبر للوضوح</td>
+      </tr>
+      <tr>
+        <td><div class="el-vis"><div style="display:flex;gap:4px"><span style="background:#2271b1;color:#fff;padding:1px 6px;border-radius:2px;font-size:9px">نشر</span><span style="border:1px solid var(--s300);padding:1px 6px;border-radius:2px;font-size:9px;color:var(--s500)">حفظ</span></div></div></td>
+        <td class="el-name">ألوان الأزرار وحقول الإدخال</td>
+        <td><span class="tag tag-style">تنسيق</span></td>
+        <td><div class="pages-list"><span>كل الصفحات</span></div></td>
+        <td class="impl">CSS: .button-primary { background:#16a34a; border-radius:6px }<br>CSS: input:focus { border-color:#16a34a }</td>
+        <td>اتساق بصري مع اللون الأساسي — يمكن تعديله حسب هوية الموقع</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="background:#fff;border-radius:var(--rl);padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">ملخص إحصائي</h3>
+    <div class="stats-row">
+      <div class="stat-box"><div class="num" style="color:#dc2626">١٢</div><div class="lbl">اقتراح إخفاء</div></div>
+      <div class="stat-box"><div class="num" style="color:var(--g600)">٤</div><div class="lbl">اقتراح تنسيق</div></div>
+      <div class="stat-box"><div class="num" style="color:#2563eb">٢</div><div class="lbl">اقتراح تسمية</div></div>
+      <div class="stat-box"><div class="num" style="color:#ea580c">١</div><div class="lbl">اقتراح طي</div></div>
+      <div class="stat-box"><div class="num" style="color:#0284c7">١</div><div class="lbl">اقتراح إضافة</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TAB 3: UX AUDIT (FULL EMBEDDED) ==================== -->
+<div class="tab-content" id="tab-audit">
+<div class="doc-inner">
+  <h1>تقرير تدقيق تجربة المستخدم — لوحة تحكم أعلام</h1>
+  <p style="color:var(--s500)">١٦ أغسطس ٢٠٢٦ · منصة أعلام</p>
+
+  <div class="callout">
+    <h3>لماذا التوجه البصري الجديد؟</h3>
+    <p>لوحة التحكم الحالية تستخدم ثيم WordPress الافتراضي (رمادي داكن + أخضر غامق) — مصمم للمطورين يقضون ساعات في لوحات التحكم. مستخدمو منصة أعلام مختلفون: يدخلون اللوحة لنشر محتوى ثم يخرجون.</p>
+    <p>التوجه الجديد يستخدم <strong>ألوان هادئة (أخضر #16a34a مع رمادي-أزرق)</strong> مع <strong>تباعد أوسع</strong> و<strong>خط عربي أوضح (IBM Plex Sans Arabic)</strong> ليشعر المستخدم أنه في بيئة مألوفة ومريحة — ليس في لوحة تحكم تقنية. يمكن تعديل الألوان لتتماشى مع هوية الموقع.</p>
+  </div>
+
+  <h2>الملخص التنفيذي</h2>
+  <p>لوحة تحكم أعلام مبنية على WordPress مع أنواع محتوى مخصصة (دروس، سلاسل علمية، مقالات، أسئلة وأجوبة، صفحات ثابتة، بودكاست، فوائد، دروس علمية). المستخدمون المستهدفون هم مديرو المحتوى — وكثير منهم لم يستخدموا WordPress سابقاً وليس لديهم خلفية تقنية.</p>
+  <p><strong>القيود التقنية:</strong> لا يمكن إجراء تغييرات هيكلية على HTML. لكن يمكن: تعديلات CSS، إخفاء عناصر، إعادة تسمية، إعادة ترتيب، وتعديلات PHP بسيطة.</p>
+  <p><strong>ملاحظة:</strong> أيقونات الشريط الجانبي تبقى كما هي — التغييرات تشمل الألوان والتسميات والعناصر المخفية فقط.</p>
+
+  <table class="doc-table">
+    <thead><tr><th>الأولوية</th><th>العدد</th><th>الوصف</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge cr">حرجة</span></td><td>٧</td><td>عناصر تُربك المستخدم أو تمنعه من إتمام مهامه</td></tr>
+      <tr><td><span class="badge md">متوسطة</span></td><td>٩</td><td>عناصر تزيد العبء المعرفي دون ضرورة</td></tr>
+      <tr><td><span class="badge mn">تحسينية</span></td><td>٦</td><td>فرص لتحسين الراحة البصرية</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 1 -->
+  <h2>١. الشريط الجانبي (القائمة الرئيسية)</h2>
+  <p>القائمة تحتوي على ١٢ عنصراً رئيسياً مع قوائم فرعية متعددة، مما يُنتج أكثر من ٤٨ رابطاً.</p>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>١.١ — إخفاء "Taxonomy Order" من جميع القوائم الفرعية</strong></div>
+  <dl class="finding-meta"><dt>الموقع</dt><dd>قائمة فرعية تحت كل نوع محتوى — يتكرر ٧ مرات</dd><dt>القرار</dt><dd>إخفاء بالكامل</dd><dt>السبب</dt><dd>صفحة إنجليزية بالكامل مع إعلانات ترويجية ("Did you find this plugin useful?"). مصطلح تقني بالإنجليزية في واجهة عربية يكسر ثقة المستخدم بالمنصة ويُشعره أنه في المكان الخطأ.</dd><dt>التنفيذ</dt><dd><code>remove_submenu_page()</code> في PHP أو CSS: <code>#adminmenu a[href*="page=to-interface-"] { display: none; }</code></dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>١.٢ — تغيير اسم "WPML" إلى "الترجمة"</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>تغيير الاسم المعروض إلى "الترجمة"</dd><dt>السبب</dt><dd>"WPML" اسم إضافة تقنية لا يعني شيئاً للمستخدم. المستخدم يبحث عن وظيفة ("أريد ترجمة محتوى") لا عن اسم منتج. مبدأ UX: سمّ الأشياء بما تفعله.</dd><dt>التنفيذ</dt><dd>PHP — تعديل <code>$menu</code> في <code>admin_menu</code> hook</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>١.٣ — إخفاء صفحات WPML المحجوبة بالصلاحيات</strong></div>
+  <dl class="finding-meta"><dt>الموقع</dt><dd>"ترجمة النصوص" و"إعدادات" تحت WPML</dd><dt>القرار</dt><dd>إخفاء من القائمة</dd><dt>السبب</dt><dd>تُظهر رسالة "ليس لديك إذن" عند النقر. عرض روابط لصفحات لا يمكن الوصول إليها يُنتج تجربة محبطة — كل نقرة فاشلة تُشعر المستخدم أنه فعل شيئاً خاطئاً.</dd><dt>التنفيذ</dt><dd>PHP: <code>remove_submenu_page()</code></dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>١.٤ — إخفاء "أدوات"</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>إخفاء من القائمة</dd><dt>السبب</dt><dd>الصفحة فارغة تماماً. عنصر قائمة يؤدي لصفحة فارغة يُعطي انطباعاً بأن المنصة ناقصة أو معطّلة.</dd><dt>التنفيذ</dt><dd>PHP: <code>remove_menu_page('tools.php')</code></dd></dl></div>
+
+  <!-- SECTION 2 -->
+  <h2>٢. الصفحة الرئيسية (Dashboard)</h2>
+  <p>الصفحة الرئيسية فارغة تماماً — لا تعرض أي محتوى أو إحصائيات أو روابط سريعة.</p>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>٢.١ — إضافة بطاقات روابط سريعة للصفحة الرئيسية</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>إضافة شبكة بطاقات (كارت لكل نوع محتوى) مع أيقونة ورابط مباشر</dd><dt>السبب</dt><dd>أول ما يراه المستخدم بعد الدخول هو صفحة فارغة — أسوأ انطباع أول. البطاقات تُعطي نظرة عامة فورية على كل ما يمكنه فعله (مثل الشاشة الرئيسية لتطبيق هاتف). هذا يُطبّق مبدأ Progressive Disclosure.</dd><dt>التنفيذ</dt><dd>PHP — إضافة dashboard widget مخصص بشبكة بطاقات HTML</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>٢.٢ — توجيه تسجيل الدخول (حل مؤقت)</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>توجيه المستخدم إلى صفحة الدروس بعد الدخول (حتى تُنفّذ بطاقات الرئيسية)</dd><dt>السبب</dt><dd>الرئيسية الفارغة = المستخدم لا يعرف من أين يبدأ. قائمة الدروس تُعطي سياقاً فورياً.</dd><dt>التنفيذ</dt><dd>PHP: <code>add_filter('login_redirect', ...)</code></dd></dl></div>
+
+  <!-- SECTION 3 -->
+  <h2>٣. جداول المحتوى</h2>
+  <p>جداول WordPress الافتراضية مع أعمدة كثيرة (عنوان، محتوى، تصنيف، تاريخ، مؤلف، لغات، SEO).</p>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>٣.١ — إخفاء أعمدة: المحتوى، SEO، أعلام اللغات، Slug</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>إبقاء: صورة، عنوان، تصنيف، حالة، تاريخ فقط</dd><dt>السبب لكل عمود</dt><dd>
+    <strong>المحتوى:</strong> مقتطف مبتور — المستخدم يفتح المنشور للقراءة.<br>
+    <strong>أعلام اللغات:</strong> إدارة الترجمة لها قسمها الخاص — لا تحتاج تكراراً في كل جدول.<br>
+    <strong>SEO:</strong> يعرض "N/A" — لا قيمة. SEO يُدار من صفحة التحرير.<br>
+    <strong>Slug:</strong> رمز URL تقني — لا يحتاجه المستخدم.</dd><dt>التنفيذ</dt><dd>PHP: <code>manage_{post_type}_posts_columns</code> filter + CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٣.٢ — تكبير الصور المصغرة</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>٣٢px → ٤٨px مع حواف مستديرة</dd><dt>السبب</dt><dd>٣٢ بكسل صغيرة جداً للتعرف على المحتوى بصرياً. الصورة يجب أن تكون مفيدة للتعرف السريع.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٣.٣ — إخفاء Bulk Actions العلوية</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>إخفاء الشريط العلوي فقط (الإبقاء على السفلي)</dd><dt>السبب</dt><dd>ميزة متقدمة — نسخة واحدة كافية لمن يحتاجها.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <!-- SECTION 4 -->
+  <h2>٤. صفحات إضافة/تحرير المحتوى</h2>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>٤.١ — طي Rank Math SEO افتراضياً (بدلاً من إخفائه)</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>طي (collapse) القسم افتراضياً — يبقى قابلاً للتوسيع بنقرة</dd><dt>السبب</dt><dd>SEO مهم وبعض المستخدمين يحتاجونه. لكن عرضه مفتوحاً بنتيجة "9/100" بلون أحمر يُخيف من لا يعرفه. الحل الوسط: اطوِه — من يحتاجه يفتحه، ومن لا يحتاجه لا يُزعجه.</dd><dt>التنفيذ</dt><dd>JS في <code>admin_footer</code> لإضافة class <code>closed</code></dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>٤.٢ — إخفاء permalink/slug</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>WP يُنشئه تلقائياً. زر "تعديل" يُغري بالتغيير الخاطئ الذي يكسر الروابط.</dd><dt>التنفيذ</dt><dd>PHP + CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🔴</span><strong>٤.٣ — إخفاء حقل المؤلف</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>يعرض اسم حساب النظام مع زر يسمح بتغيير المؤلف — تغيير خاطئ قد يُسبب مشاكل.</dd><dt>التنفيذ</dt><dd>PHP: <code>remove_meta_box('authordiv',...)</code></dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟢</span><strong>٤.٤ — تحسين زر النشر وحقل العنوان</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>الإجراء الأهم (النشر) وأول حقل (العنوان) يجب أن يكونا واضحين ومريحين.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <!-- SECTION 5 -->
+  <h2>٥. صفحات التصنيفات</h2>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٥.١ — إخفاء حقل Slug</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>WP يُنشئه تلقائياً. عرضه يُغري بالتعديل الخاطئ.</dd><dt>التنفيذ</dt><dd>CSS: <code>.term-slug-wrap { display: none; }</code></dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٥.٢ — إخفاء فلتر اللغة</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>المحتوى يُدار بالعربية. فلتر اللغات ضوضاء بصرية.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <!-- SECTION 6 -->
+  <h2>٦. الملف الشخصي (حسابك)</h2>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٦.١ — إخفاء حقول SEO الشخصية + إعدادات WPML</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>حقول تقنية (Twitter، وصف SEO) لا تخص المستخدم. إعدادات WPML — تغيير لغة المحرر بالخطأ مُشكلة.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟢</span><strong>٦.٣ — إخفاء خيارات المحرر المرئي والاختصارات وشريط الأدوات</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>تعطيل المحرر المرئي بالخطأ يُحوّله لـ HTML خام — كارثة لمستخدم غير تقني.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <!-- SECTION 7 -->
+  <h2>٧. عناصر عامة (كل الصفحات)</h2>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٧.١ — إخفاء مُبدّل اللغة وخيارات الشاشة</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>مُبدّل اللغة: ضغطه بالخطأ يُحوّل الواجهة للإنجليزية. خيارات الشاشة: لا نريد إعادة تفعيل ما أخفيناه.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٧.٢ — إخفاء رقم إصدار WordPress</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>معلومة تقنية. قد تُثير قلقاً ("هل النسخة قديمة؟"). كشف الإصدار خطر أمني أيضاً.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟢</span><strong>٧.٣ — تحسين الخط العربي وارتفاع الأسطر</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>WP مصمم للاتينية. النص العربي يبدو مضغوطاً بالإعدادات الافتراضية. زيادة الحجم من ١٣ إلى ١٤px وارتفاع الأسطر من ١.٤ إلى ١.٨ يُحسّن القراءة.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟢</span><strong>٧.٤ — توحيد ألوان الأزرار وحقول الإدخال</strong></div>
+  <dl class="finding-meta"><dt>السبب</dt><dd>اتساق بصري مع اللون الأساسي للمنصة. يمكن تغيير اللون ليتماشى مع هوية الموقع.</dd><dt>التنفيذ</dt><dd>CSS</dd></dl></div>
+
+  <div class="finding"><div class="finding-head"><span class="pri">🟡</span><strong>٧.٥ — اختصار اسم الدور</strong></div>
+  <dl class="finding-meta"><dt>القرار</dt><dd>"مدير لوحة تحكم نظام إدارة المحتوى" → "مدير المحتوى"</dd><dt>السبب</dt><dd>٧ كلمات في عمود جدول — طويل جداً. "مدير المحتوى" أوضح وأقصر.</dd><dt>التنفيذ</dt><dd>PHP</dd></dl></div>
+
+  <!-- SUMMARY TABLE -->
+  <h2>ملخص التوصيات</h2>
+  <table class="doc-table">
+    <thead><tr><th>#</th><th>الإجراء</th><th>النوع</th><th>السبب</th></tr></thead>
+    <tbody>
+      <tr><td>١</td><td>بطاقات روابط سريعة للرئيسية</td><td>PHP</td><td>الرئيسية فارغة — بطاقات تعطي نقطة بداية</td></tr>
+      <tr><td>٢</td><td>طي Rank Math SEO افتراضياً</td><td>JS</td><td>SEO مهم لكن النتيجة الحمراء تُخيف — اطوِه</td></tr>
+      <tr><td>٣</td><td>إخفاء Taxonomy Order</td><td>PHP</td><td>صفحة إنجليزية مع إعلانات</td></tr>
+      <tr><td>٤</td><td>إخفاء permalink/slug</td><td>PHP+CSS</td><td>تعديله يكسر الروابط</td></tr>
+      <tr><td>٥</td><td>إخفاء أعمدة زائدة</td><td>PHP+CSS</td><td>تقليل كثافة المعلومات</td></tr>
+      <tr><td>٦</td><td>توجيه الدخول لصفحة الدروس</td><td>PHP</td><td>الرئيسية فارغة</td></tr>
+      <tr><td>٧</td><td>إخفاء صفحات بدون صلاحيات</td><td>PHP</td><td>رسائل "ليس لديك إذن"</td></tr>
+      <tr><td>٨</td><td>تغيير WPML → الترجمة</td><td>PHP</td><td>سمّ بالوظيفة لا بالاسم</td></tr>
+      <tr><td>٩</td><td>توحيد الألوان والخط</td><td>CSS</td><td>لون موحد + راحة عربية</td></tr>
+    </tbody>
+  </table>
+
+  <h2>المُسلّمات</h2>
+  <table class="doc-table">
+    <thead><tr><th>المُسلّم</th><th>الوصف</th></tr></thead>
+    <tbody>
+      <tr><td>هذه الصفحة</td><td>محاكاة تفاعلية (قبل/بعد) + جدول عناصر + تقرير UX + كود CSS و PHP</td></tr>
+      <tr><td>لقطات الشاشة</td><td>٤٩ لقطة شاشة للوضع الحالي مرفقة في مجلد screenshots</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ==================== TAB 4: CSS ==================== -->
+<div class="tab-content" id="tab-css">
+<div class="doc-inner">
+  <h1>muslimat-admin-override.css</h1>
+  <p style="color:var(--s500)">ملف CSS جاهز للتطبيق — أضفه عبر <code>wp_enqueue_style</code> في <code>admin_enqueue_scripts</code></p>
+  <div class="code-block" id="css-code">جارٍ التحميل...</div>
+</div>
+</div>
+
+<!-- ==================== TAB 5: PHP ==================== -->
+<div class="tab-content" id="tab-php">
+<div class="doc-inner">
+  <h1>muslimat-functions.php</h1>
+  <p style="color:var(--s500)">أضف في functions.php الخاص بالثيم أو أنشئ إضافة مخصصة</p>
+  <div class="code-block" id="php-code">جارٍ التحميل...</div>
+</div>
+</div>
+
+<!-- Fullscreen modal -->
+<div class="fs-modal" id="fsModal"><div class="fs-modal-inner" id="fsContent"></div></div>
+<button class="fs-close" id="fsClose" onclick="closeFullscreen()">&times;</button>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('vis'));
+  document.getElementById('tab-' + id).classList.add('vis');
+  document.querySelectorAll('.tn .bg button').forEach(b => b.classList.remove('a'));
+  if (btn) btn.classList.add('a');
+}
+
+// Toggle between annotated and clean view
+// Toggle code pane
+function toggleCode(id) {
+  var pane = document.getElementById('code-' + id);
+  var btn = document.getElementById('codebtn-' + id);
+  if (!pane) return;
+  pane.classList.toggle('open');
+  if (btn) btn.classList.toggle('open');
+}
+
+function setView(paneId, mode) {
+  var pane = document.getElementById(paneId);
+  if (!pane) return;
+  var content = pane.querySelector('.after-content');
+  var card = pane.closest('.comp-card');
+  var codePane = card ? card.querySelector('.comp-code') : null;
+  // Toggle: clicking code while already in code → back to annotated
+  if (mode === 'code' && codePane && codePane.classList.contains('vis')) {
+    mode = 'annotated';
+  }
+  if (mode === 'code') {
+    if (content) content.style.display = 'none';
+    if (codePane) { pane.appendChild(codePane); codePane.classList.add('vis'); }
+  } else {
+    if (content) { content.style.display = ''; content.classList.toggle('clean-mode', mode === 'clean'); }
+    if (codePane) codePane.classList.remove('vis');
+  }
+  pane.querySelectorAll('.vb').forEach(function(b) {
+    b.classList.remove('active');
+    if (b.dataset.mode === mode) b.classList.add('active');
+  });
+}
+
+// Open fullscreen modal with clean version
+function viewFull(paneId) {
+  var pane = document.getElementById(paneId);
+  if (!pane) return;
+  var content = pane.querySelector('.after-content');
+  if (!content) return;
+  var modal = document.getElementById('fsModal');
+  var inner = document.getElementById('fsContent');
+  var clone = content.cloneNode(true);
+  clone.classList.add('clean-mode');
+  clone.style.borderRadius = '0';
+  inner.innerHTML = '';
+  inner.appendChild(clone);
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFullscreen() {
+  document.getElementById('fsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on clicking backdrop
+document.getElementById('fsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeFullscreen();
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeFullscreen();
+});
+
+// Load code files via fetch (fallback to inline summary)
+async function loadCode(id, file) {
+  try {
+    const r = await fetch('../' + file);
+    if (r.ok) { document.getElementById(id).textContent = await r.text(); return; }
+  } catch(e) {}
+  if (id === 'css-code') document.getElementById(id).textContent = '/* See file: muslimat-admin-override.css */\n/* Load this page from a local server to auto-load the full file */';
+  if (id === 'php-code') document.getElementById(id).textContent = '<?php\n// See file: muslimat-functions.php\n// Load this page from a local server to auto-load the full file';
+}
+loadCode('css-code', 'muslimat-admin-override.css');
+loadCode('php-code', 'muslimat-functions.php');
+</script>
+
+</body>
+</html>
