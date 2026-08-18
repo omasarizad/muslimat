@@ -1,0 +1,643 @@
+/*
+ * Muslimat Admin Panel — UX Override CSS
+ * ========================================
+ * Drop this file into WP admin via:
+ *   wp_enqueue_style('muslimat-override', 'path/to/muslimat-admin-override.css');
+ *   in functions.php inside admin_enqueue_scripts hook.
+ *
+ * Purpose: Simplify the admin panel for non-technical content managers.
+ * Constraint: CSS overrides only — no HTML structure changes.
+ * Companion: muslimat-functions.php handles PHP-level changes.
+ * Date: 2026-08-16
+ *
+ * WHY THIS VISUAL DIRECTION:
+ * The default WP admin (dark gray + green) is designed for developers
+ * who spend hours in dashboards. Aalaam users are content managers
+ * who enter to publish content and leave. We use calmer colors
+ * (slate + green), wider spacing, rounded corners, and a better
+ * Arabic font (IBM Plex Sans Arabic) so the panel feels like a
+ * familiar app — not an intimidating technical control room.
+ */
+
+
+/* ==========================================================================
+   1. GLOBAL — Typography, Colors, Base Overrides
+   ========================================================================== */
+
+/* Better Arabic text rendering */
+body.rtl,
+body.rtl #wpcontent,
+body.rtl #wpbody-content {
+  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* Hide WordPress version number */
+#footer-upgrade,
+#footer-thankyou {
+  display: none !important;
+}
+
+/* Hide "Screen Options" button */
+#screen-options-link-wrap,
+#contextual-help-link-wrap,
+#screen-meta-links {
+  display: none !important;
+}
+
+/* Hide admin bar help & language flag */
+#wpadminbar .ab-icon.dashicons-translation,
+#wpadminbar #wp-admin-bar-WPML_ALS,
+#wpadminbar .ab-sub-wrapper .quicklinks {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   2. SIDEBAR — Cleaner Navigation
+   ========================================================================== */
+
+/* Softer sidebar background */
+#adminmenuback,
+#adminmenuwrap,
+#adminmenu {
+  background: #1e293b !important;
+}
+
+/* Active/hover states — warm accent instead of harsh green */
+#adminmenu .wp-has-current-submenu .wp-submenu,
+#adminmenu .wp-has-current-submenu > a,
+#adminmenu li.current a.menu-top,
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu {
+  background: #16a34a !important;
+  color: #fff !important;
+}
+
+#adminmenu li.menu-top:hover,
+#adminmenu li a:hover {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Submenu styling */
+#adminmenu .wp-submenu {
+  background: #0f172a !important;
+}
+
+#adminmenu .wp-submenu a {
+  color: #94a3b8 !important;
+  font-size: 13px !important;
+  padding: 6px 16px !important;
+}
+
+#adminmenu .wp-submenu a:hover,
+#adminmenu .wp-submenu li.current a {
+  color: #fff !important;
+}
+
+/* Better spacing for menu items */
+#adminmenu li.menu-top > a {
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+}
+
+/* Aalaam logo area */
+#adminmenu .wp-menu-image img {
+  opacity: 0.9;
+}
+
+/* ---- HIDE: Taxonomy Order menu items (English, technical) ---- */
+#adminmenu a[href*="page=to-interface-"] {
+  display: none !important;
+}
+
+/* ---- HIDE: Tools menu (empty page) ---- */
+#adminmenu #menu-tools,
+#adminmenu li.menu-icon-tools {
+  display: none !important;
+}
+
+/* ---- HIDE: WPML pages that show permission errors ---- */
+/* String translation — shows permission denied */
+#adminmenu a[href*="wpml-string-translation"] {
+  display: none !important;
+}
+
+/* WPML settings — shows permission denied */
+#adminmenu a[href*="page=tm/menu/settings"] {
+  display: none !important;
+}
+
+/* ---- Rename WPML visually (hide text, show Arabic via pseudo-element) ---- */
+#adminmenu a[href*="page=tm/menu/main.php"] .wp-menu-name {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+#adminmenu a[href*="page=tm/menu/main.php"] .wp-menu-name::after {
+  content: "الترجمة" !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+/* Hide "Collapse menu" text — keep arrow */
+#collapse-menu span {
+  font-size: 0;
+}
+#collapse-menu span::after {
+  content: "طي القائمة";
+  font-size: 13px;
+}
+
+
+/* ==========================================================================
+   3. CONTENT LIST TABLES — Simplify Columns
+   ========================================================================== */
+
+/* ---- HIDE: Excerpt/content preview column ---- */
+.column-content,
+th.column-content {
+  display: none !important;
+}
+
+/* ---- HIDE: SEO columns ---- */
+.column-rank_math_seo_details,
+th.column-rank_math_seo_details,
+.column-wpseo-score,
+th.column-wpseo-score,
+.column-wpseo-title,
+th.column-wpseo-title {
+  display: none !important;
+}
+
+/* ---- HIDE: Slug column ---- */
+.column-slug,
+th.column-slug {
+  display: none !important;
+}
+
+/* ---- HIDE: WPML language flag columns ---- */
+td.column-icl_translations,
+th.column-icl_translations,
+.wpml-column-icon,
+.column-icl_translations {
+  display: none !important;
+}
+
+/* ---- HIDE: SEO details column in static pages ---- */
+.column-wpseo_score,
+th.column-wpseo_score,
+td.column-wpseo_score {
+  display: none !important;
+}
+
+/* Bigger thumbnails in list tables */
+.wp-list-table .column-thumbnail img,
+.wp-list-table td img.wp-post-image {
+  width: 60px !important;
+  height: 60px !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+}
+
+/* Better row spacing */
+.wp-list-table td,
+.wp-list-table th {
+  padding: 12px 10px !important;
+}
+
+/* Cleaner row hover */
+.wp-list-table tbody tr:hover {
+  background: #f1f5f9 !important;
+}
+
+/* Softer table header */
+.wp-list-table thead th {
+  background: #f8fafc !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+
+/* ---- HIDE: Top bulk actions bar (advanced feature, keep bottom one) ---- */
+/* السبب: المستخدمة تتعامل مع منشور واحد في كل مرة — الإجراءات المجمّعة ضوضاء بصرية */
+.tablenav.top .actions:not(.bulkactions),
+.tablenav.top .bulkactions {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   4. ADD/EDIT CONTENT FORMS — Declutter
+   ========================================================================== */
+
+/* ---- COLLAPSE: Rank Math SEO metabox (closed by default, expandable) ---- */
+/* السبب: SEO مهم لبعض المستخدمين — نطويه بدلاً من إخفائه. من يحتاجه يفتحه بنقرة */
+/* Note: JS in functions.php adds .closed class on page load */
+#rank_math_metabox.closed .inside,
+#rank-math-metabox.closed .inside {
+  display: none;
+}
+/* Hide standalone Rank Math UI noise (tooltips, floating scores) */
+.rank-math-tooltip,
+.rank-math-status,
+.rank-math-score {
+  display: none !important;
+}
+
+/* ---- HIDE: Permalink/slug edit area ---- */
+#edit-slug-box,
+#slugdiv,
+.edit-slug {
+  display: none !important;
+}
+
+/* ---- HIDE: Author metabox ---- */
+/* السبب: يعرض "Muslimat Admin" — اسم تقني لا يُفيد المستخدمة */
+#authordiv,
+#pageparentdiv .inside label:first-of-type {
+  display: none !important;
+}
+
+/* ---- HIDE: Rank Math SEO checklist that appears in posts ---- */
+.rank-math-checklist,
+.rank-math-content-ai,
+.rank-math-seo-analysis {
+  display: none !important;
+}
+
+/* ---- HIDE: FAQ Schema section ---- */
+#rank-math-faq,
+.rank-math-faq-wrapper {
+  display: none !important;
+}
+
+/* Better metabox styling */
+.postbox {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  margin-bottom: 16px !important;
+}
+
+.postbox .postbox-header,
+.postbox .hndle {
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  padding: 12px 16px !important;
+}
+
+.postbox .hndle span {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+}
+
+/* Publish box — cleaner */
+#submitdiv .inside {
+  padding: 12px !important;
+}
+
+/* Publish button — more prominent */
+#publish,
+#submitdiv .button-primary {
+  background: #16a34a !important;
+  border-color: #15803d !important;
+  border-radius: 6px !important;
+  padding: 8px 24px !important;
+  font-size: 14px !important;
+  height: auto !important;
+  line-height: 1.6 !important;
+}
+
+#publish:hover,
+#submitdiv .button-primary:hover {
+  background: #15803d !important;
+}
+
+/* Title field — larger, cleaner */
+#title,
+#titlewrap input {
+  font-size: 22px !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  height: auto !important;
+}
+
+#title:focus,
+#titlewrap input:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) !important;
+}
+
+
+/* ==========================================================================
+   5. TAXONOMY PAGES — Clean Up
+   ========================================================================== */
+
+/* ---- HIDE: Slug field in taxonomy forms ---- */
+.term-slug-wrap,
+.form-field.term-slug-wrap {
+  display: none !important;
+}
+
+/* Smaller description field */
+.term-description-wrap textarea {
+  height: 60px !important;
+}
+
+/* ---- HIDE: Language filter on taxonomy pages ---- */
+.icl_subsubsub,
+.tablenav .icl_subsubsub {
+  display: none !important;
+}
+
+/* Better taxonomy form styling */
+.form-field input[type="text"] {
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+.form-field input[type="text"]:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) !important;
+}
+
+/* Add taxonomy button */
+#submit,
+.form-wrap .button {
+  background: #16a34a !important;
+  border-color: #15803d !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  padding: 8px 20px !important;
+  font-size: 14px !important;
+  height: auto !important;
+  line-height: 1.6 !important;
+}
+
+
+/* ==========================================================================
+   6. TAXONOMY ORDER PAGE — Hide Plugin Noise
+   ========================================================================== */
+
+/* Hide plugin promo messages */
+.to-page-notice,
+.taxonomy-ordering .notice,
+.taxonomy-ordering .updated,
+div.to-page-notice {
+  display: none !important;
+}
+
+/* Style the Update button to Arabic if possible */
+.to-update-button,
+.taxonomy-ordering input[type="submit"] {
+  background: #16a34a !important;
+  border-color: #15803d !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  padding: 8px 24px !important;
+  font-size: 0 !important;
+}
+
+.to-update-button::after,
+.taxonomy-ordering input[type="submit"]::after {
+  content: "تحديث" !important;
+  font-size: 14px !important;
+}
+
+
+/* ==========================================================================
+   7. PROFILE PAGE — Simplify
+   ========================================================================== */
+
+/* ---- HIDE: Admin color scheme picker ---- */
+/* السبب: تغييرها يكسر اتساق العلامة التجارية عبر جميع المستخدمين */
+.user-admin-color-wrap,
+tr.user-admin-color-wrap {
+  display: none !important;
+}
+
+/* ---- HIDE: Rank Math SEO section in profile ---- */
+.rank-math-person-social,
+.rank-math-user-wrap,
+[class*="rank-math"] {
+  display: none !important;
+}
+
+/* ---- HIDE: WPML language settings in profile ---- */
+.wpml-section,
+tr.wpml-language-select {
+  display: none !important;
+}
+
+/* ---- HIDE: Visual editor disable option ---- */
+.user-rich-editing-wrap {
+  display: none !important;
+}
+
+/* ---- HIDE: Keyboard shortcuts option ---- */
+.user-comment-shortcuts-wrap {
+  display: none !important;
+}
+
+/* ---- HIDE: Toolbar option ---- */
+.user-admin-bar-front-wrap,
+.show-admin-bar {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   8. MEDIA LIBRARY — Clean Up
+   ========================================================================== */
+
+/* Hide language filter in media */
+.media-toolbar .wpml-media-lang-selector,
+.media-toolbar-secondary .wpml-media-lang-selector,
+select.wpml-media-lang-filter {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   9. GENERAL BUTTONS & FORMS — Consistent Styling
+   ========================================================================== */
+
+/* All primary buttons */
+.button-primary,
+.wp-core-ui .button-primary {
+  background: #16a34a !important;
+  border-color: #15803d !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.button-primary:hover,
+.wp-core-ui .button-primary:hover {
+  background: #15803d !important;
+  border-color: #166534 !important;
+}
+
+/* Secondary buttons */
+.button,
+.wp-core-ui .button {
+  border-radius: 6px !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Input fields global */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) !important;
+  outline: none !important;
+}
+
+
+/* ==========================================================================
+   10. WPML TRANSLATION QUEUE — Clean Up
+   ========================================================================== */
+
+/* Hide XLIFF import/export section if too technical */
+.wpml-xliff-section,
+.js-xliff-section {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   11. DASHBOARD — Welcoming Message
+   ========================================================================== */
+
+/* Dashboard quick-links card grid */
+.aalaam-dash-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  padding: 16px 0;
+}
+.aalaam-dash-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px 12px;
+  text-align: center;
+  text-decoration: none;
+  color: #334155;
+  transition: 0.15s;
+}
+.aalaam-dash-card:hover {
+  border-color: #16a34a;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.1);
+  color: #15803d;
+}
+.aalaam-dash-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  color: #15803d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  font-size: 22px;
+}
+.aalaam-dash-card span {
+  font-size: 13px;
+  font-weight: 600;
+}
+@media (max-width: 800px) {
+  .aalaam-dash-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Page title styling */
+.wrap > h1,
+.wrap > h1.wp-heading-inline {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  margin-bottom: 20px !important;
+}
+
+
+/* ==========================================================================
+   12. NOTICES & ALERTS — Softer Styling
+   ========================================================================== */
+
+/* Softer update notices */
+.notice,
+.updated,
+.update-nag {
+  border-radius: 8px !important;
+  border-width: 0 0 0 4px !important;
+  padding: 12px 16px !important;
+}
+
+/* Hide non-essential admin notices */
+.notice.notice-info:not(.is-dismissible),
+.update-nag {
+  display: none !important;
+}
+
+/* Permission denied pages — softer message */
+.wp-die-message {
+  font-size: 16px !important;
+  color: #64748b !important;
+  background: #f8fafc !important;
+  padding: 24px !important;
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  max-width: 500px !important;
+  margin: 40px auto !important;
+  text-align: center !important;
+}
+
+
+/* ==========================================================================
+   13. LOGIN PAGE — Brand Alignment
+   ========================================================================== */
+
+/* If you also want to style the login page */
+body.login {
+  background: #f8fafc !important;
+}
+
+body.login #loginform {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+body.login .button-primary {
+  background: #16a34a !important;
+  border-color: #15803d !important;
+  border-radius: 6px !important;
+}
